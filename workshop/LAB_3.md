@@ -82,9 +82,8 @@ Add [`.env`](lab3_lab4/.env) next to [`.env.example`](lab3_lab4/.env.example) (y
 
 ```env
 OPENAI_API_KEY=sk-...
-# or
-ANTHROPIC_API_KEY=sk-ant-...
-AI_PROVIDER=openai
+AI_BASE_URL=
+AI_MODEL=gpt-5.4
 
 # Optional
 CESIUM_ION_ACCESS_TOKEN=...
