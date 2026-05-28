@@ -75,22 +75,7 @@ pnpm dev # -> http://localhost:3000
 
 Instead of hardcoding every external request as a tool inside your chat app, you can host tools on an MCP server and enable any MCP-compatible client to consume them.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant App as Next.js Chat App :3000
-    participant MCP as Your MCP Server :3001
-    participant Overpass as Overpass API (OSM)
-
-    User->>App: "Show me museums in Paris"
-    App->>App: Agent reads MCP tool list
-    App->>MCP: POST /mcp -> get_points_of_interest(lat, lon, type:"museum")
-    MCP->>Overpass: POST /api/interpreter (Overpass QL query)
-    Overpass-->>MCP: JSON results (name, lat, lon, tags)
-    MCP-->>App: JSON results
-    App->>App: Visualize on globe
-    App-->>User: "Here are the museums in Paris..."
-```
+![Sequence diagram showing the MCP flow: User sends a message to the Next.js Chat App, which calls the MCP Server, which queries the Overpass API and returns results back through the chain](images/lab2_mcp_sequence.png)
 
 ---
 
@@ -165,26 +150,29 @@ import { searchPois } from "../overpass.js";
 
 // Register all POI-related tools on the MCP server instance.
 export function registerPoiTools(server: McpServer) {
-  server.tool(
+  server.registerTool(
     // Tool name exposed over MCP.
     "get_points_of_interest",
-    // Tool description used by the LLM for intent matching.
-    "Search for real-world points of interest near a location using OpenStreetMap data. " +
-      "Returns name, coordinates, and tags for each result. " +
-      "Supported types include: museum, attraction, monument, restaurant, cafe, park, hotel, viewpoint, artwork, theatre.",
     {
+      // Tool description used by the LLM for intent matching.
+      description:
+        "Search for real-world points of interest near a location using OpenStreetMap data. " +
+        "Returns name, coordinates, and tags for each result. " +
+        "Supported types include: museum, attraction, monument, restaurant, cafe, park, hotel, viewpoint, artwork, theatre.",
       // Input schema defines arguments and descriptions for the model.
-      latitude: z.number().describe("Center latitude (e.g. 48.8566 for Paris)"),
-      longitude: z.number().describe("Center longitude (e.g. 2.3522 for Paris)"),
-      type: z
-        .string()
-        .describe(
-          "Type of POI to search for (e.g. 'museum', 'attraction', 'monument', 'restaurant', 'cafe', 'park')",
-        ),
-      radius: z
-        .number()
-        .optional()
-        .describe("Search radius in meters (default 5000)"),
+      inputSchema: {
+        latitude: z.number().describe("Center latitude (e.g. 48.8566 for Paris)"),
+        longitude: z.number().describe("Center longitude (e.g. 2.3522 for Paris)"),
+        type: z
+          .string()
+          .describe(
+            "Type of POI to search for (e.g. 'museum', 'attraction', 'monument', 'restaurant', 'cafe', 'park')",
+          ),
+        radius: z
+          .number()
+          .optional()
+          .describe("Search radius in meters (default 5000)"),
+      },
     },
     async ({ latitude, longitude, type, radius }) => {
       // Call the Overpass client and return the results as MCP text content.
@@ -391,28 +379,7 @@ Try these prompts:
 
 ### Initialization flow — on app mount
 
-```mermaid
-flowchart LR
-    subgraph Browser["Next.js App (browser)"]
-        A[useMcpServers hook] -->|on mount| B[POST /mcp<br/>discover tools]
-        C[ToolRegistry]
-        D["getAll() -> flat tool map"]
-        E[useAIChat]
-    end
-
-    subgraph MCP["MCP Server :3001"]
-        F[get_points_of_interest]
-    end
-
-    subgraph Cesium["Cesium Tools"]
-        H[flyTo]
-    end
-
-    B -->|tool list| C
-    H -->|registered locally| C
-    C -->|merges| D
-    D -->|tools available| E
-```
+![Flowchart showing the initialization flow: useMcpServers discovers tools from the MCP server on mount, ToolRegistry merges them with local Cesium tools, and useAIChat receives the merged tool map](images/lab2_init_flow.png)
 
 1. When the app first loads, `useMcpServers` calls `POST /mcp` to discover all available MCP tools.
 2. `ToolRegistry` merges those MCP tools with the locally-defined Cesium tools into one set.
@@ -420,32 +387,7 @@ flowchart LR
 
 ### User chat input flow — on each message
 
-```mermaid
-flowchart LR
-    subgraph Browser["Next.js App (browser)"]
-        U[User message] --> E[useAIChat]
-        E --> I{LLM picks tool}
-    end
-
-    subgraph MCP["MCP Server :3001"]
-        F[get_points_of_interest]
-    end
-
-    subgraph External["External APIs"]
-        G[Overpass API<br/>OpenStreetMap]
-    end
-
-    subgraph Cesium["Cesium Tools"]
-        H[flyTo]
-    end
-
-    I -->|MCP tool| F
-    F -->|query| G
-    G -->|JSON results| F
-    F -->|results| E
-    I -->|Cesium tool| H
-    H -->|camera animates| E
-```
+![Flowchart showing the user chat input flow: user message goes to useAIChat, the LLM picks either get_points_of_interest (MCP → Overpass) or flyTo (Cesium), and results flow back to the chat](images/lab2_chat_flow.png)
 
 1. The user sends a message; `useAIChat` forwards it to the LLM along with the merged tool list from the initialization flow.
 2. If the LLM picks `get_points_of_interest`, the app calls the MCP server, the MCP server queries Overpass, and the results are returned back to the chat.
@@ -587,20 +529,23 @@ import { z } from "zod";
 import { fetchEarthquakes } from "../usgs-client.js";
 
 export function registerEarthquakeTools(server: McpServer) {
-  server.tool(
+  server.registerTool(
     "get_recent_earthquakes",
-    "Fetch recent earthquakes from the USGS feed. " +
-      "Returns a list of earthquakes with magnitude, location name, coordinates, depth, and timestamp. " +
-      "Results are sorted by magnitude descending so the strongest quake is first.",
     {
-      period: z
-        .enum(["hour", "day", "week", "month"])
-        .describe("Time window to search. 'week' is a good default."),
-      min_magnitude: z
-        .enum(["all", "1.0", "2.5", "4.5", "significant"])
-        .describe(
-          "Minimum magnitude filter. Use '4.5' for notable quakes, 'significant' for major events only.",
-        ),
+      description:
+        "Fetch recent earthquakes from the USGS feed. " +
+        "Returns a list of earthquakes with magnitude, location name, coordinates, depth, and timestamp. " +
+        "Results are sorted by magnitude descending so the strongest quake is first.",
+      inputSchema: {
+        period: z
+          .enum(["hour", "day", "week", "month"])
+          .describe("Time window to search. 'week' is a good default."),
+        min_magnitude: z
+          .enum(["all", "1.0", "2.5", "4.5", "significant"])
+          .describe(
+            "Minimum magnitude filter. Use '4.5' for notable quakes, 'significant' for major events only.",
+          ),
+      },
     },
     async ({ period, min_magnitude }) => {
       const results = await fetchEarthquakes(min_magnitude, period);

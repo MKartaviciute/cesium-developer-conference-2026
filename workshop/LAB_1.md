@@ -68,8 +68,9 @@ Then open `.env` and fill in your API key (provided during the workshop):
 # Optional — some imagery/terrain features require a Cesium Ion token
 CESIUM_ION_ACCESS_TOKEN=your_token_here
 
-AI_PROVIDER=openai
-OPENAI_API_KEY=sk-... # will be provided during the workshop
+OPENAI_API_KEY=sk-...
+AI_BASE_URL=
+AI_MODEL=gpt-5.4
 ```
 
 Now we can run the app. Execute the following command and open a new browser tab to http://localhost:3000.
