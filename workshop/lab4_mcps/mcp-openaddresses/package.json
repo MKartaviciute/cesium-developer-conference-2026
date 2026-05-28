@@ -1,0 +1,30 @@
+{
+  "name": "@cesium-ai/mcp-openaddresses",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "download-data": "tsx src/download-data.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-rate-limit": "^7.0.0",
+    "unzipper": "^0.10.14",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20",
+    "@types/unzipper": "^0.10.9",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

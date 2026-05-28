@@ -1,0 +1,7 @@
+.env
+.env.*
+data/*.zip
+data/*.json
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm

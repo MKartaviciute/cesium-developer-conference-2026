@@ -1,0 +1,5 @@
+# Marks lab4_mcps as a standalone pnpm workspace root.
+# This prevents pnpm from climbing up to the monorepo root when running
+# `pnpm install` inside any mcp-* subdirectory.
+packages:
+  - "mcp-*"

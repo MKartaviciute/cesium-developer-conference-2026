@@ -1,0 +1,49 @@
+{
+  "name": "cesium-workshop-lab1",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "copy-cesium-assets": "node scripts/copy-cesium-assets.mjs",
+    "postinstall": "node scripts/copy-cesium-assets.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.69",
+    "@ai-sdk/mcp": "^1.0.36",
+    "@ai-sdk/openai": "^3.0.52",
+    "@radix-ui/react-slot": "^1.2.4",
+    "ai": "^6.0.159",
+    "cesium": "^1.140.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "highlight.js": "^11.11.1",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "protobufjs": "^8.2.0",
+      "@protobufjs/utf8": "^1.1.1"
+    }
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
