@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer, Cesium3DTileset } from "cesium";
-import { cesium } from "./cesium-loader";
 import type {
   AddTilesetOutput,
   ListTilesetsOutput,
@@ -47,7 +47,6 @@ export async function addTileset(
   },
 ): Promise<AddTilesetOutput> {
   const { type, assetId, url, name, show = true } = params;
-  const Cesium = await cesium();
 
   let tileset: InstanceType<typeof Cesium.Cesium3DTileset>;
 
@@ -160,7 +159,6 @@ export async function styleTileset(
   },
 ): Promise<StyleTilesetOutput> {
   const { id, name, color, colorConditions, show, showConditions } = params;
-  const Cesium = await cesium();
   const registry = getTilesetMap(viewer);
 
   let targetId: string | undefined;

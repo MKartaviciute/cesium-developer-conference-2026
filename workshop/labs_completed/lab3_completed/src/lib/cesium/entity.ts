@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 import type {
   AddEntityOutput,
   RemoveEntityOutput,
@@ -39,7 +39,6 @@ export async function addEntity(
   },
 ): Promise<AddEntityOutput> {
   const { latitude, longitude, altitude = 0, name, type = "point", description, color } = params;
-  const Cesium = await cesium();
   const cesiumColor = color ? Cesium.Color.fromCssColorString(color) : Cesium.Color.RED;
 
   const entityOptions: Parameters<typeof viewer.entities.add>[0] = {
@@ -119,7 +118,6 @@ export async function addPolygon(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const cartesians = toCartesianArray(Cesium, positions);
 
   const entity = viewer.entities.add({
@@ -161,7 +159,6 @@ export async function addPolyline(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const cartesians = toCartesianArray(Cesium, positions);
 
   const entity = viewer.entities.add({
@@ -212,7 +209,6 @@ export async function addRectangle(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
 
   const entity = viewer.entities.add({
     name,
@@ -266,7 +262,6 @@ export async function addBox(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
   const orientation = Cesium.Transforms.headingPitchRollQuaternion(
     position,
@@ -321,7 +316,6 @@ export async function addCylinder(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
 
   const entity = viewer.entities.add({
     name,
@@ -372,7 +366,6 @@ export async function addModel(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
   const orientation = Cesium.Transforms.headingPitchRollQuaternion(
     position,
@@ -424,7 +417,6 @@ export async function addCorridor(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const cartesians = toCartesianArray(Cesium, positions);
 
   const cornerTypeMap: Record<string, number> = {
@@ -489,7 +481,6 @@ export async function addEllipse(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
 
   const entity = viewer.entities.add({
     name,
@@ -536,7 +527,6 @@ export async function addWall(
     description,
     id,
   } = params;
-  const Cesium = await cesium();
   const cartesians = toCartesianArray(Cesium, positions);
 
   const entity = viewer.entities.add({
@@ -563,7 +553,6 @@ export async function listEntities(
   params: { filterByType?: string },
 ): Promise<ListEntitiesOutput> {
   const { filterByType } = params;
-  const Cesium = await cesium();
   const currentTime = viewer.clock.currentTime;
 
   const graphicsTypeMap: Record<string, string> = {

@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 import type {
   AddImageryLayerOutput,
   ListImageryLayersOutput,
@@ -24,7 +24,6 @@ export async function addImageryLayer(
   },
 ): Promise<AddImageryLayerOutput> {
   const { type, url, assetId, layers, name, alpha = 1, show = true } = params;
-  const Cesium = await cesium();
   let provider: InstanceType<typeof Cesium.ImageryProvider> | undefined;
 
   try {
