@@ -3,7 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { registerTnmTools } from "./tools/index.js";
+import { registerPlanetaryComputerTools } from "./tools/planetarycomputer-tools.js";
 
 const app = express();
 
@@ -11,7 +11,6 @@ const allowedOrigin = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
 app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
-// 60 requests per minute per IP
 const mcpLimiter = rateLimit({
   windowMs: 60_000,
   max: 60,
@@ -19,10 +18,9 @@ const mcpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// SDK 1.29.0: stateless — fresh McpServer + transport per POST
 app.post("/mcp", mcpLimiter, async (req, res) => {
-  const server = new McpServer({ name: "tnm", version: "1.0.0" });
-  registerTnmTools(server);
+  const server = new McpServer({ name: "planetarycomputer", version: "1.0.0" });
+  registerPlanetaryComputerTools(server);
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
   await transport.handleRequest(req, res, req.body);
@@ -31,7 +29,7 @@ app.post("/mcp", mcpLimiter, async (req, res) => {
 app.get("/mcp", (_req, res) => { res.status(405).set("Allow", "POST, DELETE").end(); });
 app.delete("/mcp", (_req, res) => { res.status(200).end(); });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3019;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3022;
 app.listen(PORT, () => {
-  console.log(`TNM MCP server running on http://localhost:${PORT}/mcp`);
+  console.log(`Planetary Computer MCP server running on http://localhost:${PORT}/mcp`);
 });

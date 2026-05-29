@@ -3,7 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { registerBuildingFootprintTools } from "./tools/index.js";
+import { registerOvertureTools } from "./tools/overture-tools.js";
 
 const app = express();
 
@@ -21,11 +21,8 @@ const mcpLimiter = rateLimit({
 // Stateless — fresh McpServer + transport per POST
 app.post("/mcp", mcpLimiter, async (req, res) => {
   try {
-    const server = new McpServer({
-      name: "buildingfootprints",
-      version: "1.0.0",
-    });
-    registerBuildingFootprintTools(server);
+    const server = new McpServer({ name: "overture", version: "1.0.0" });
+    registerOvertureTools(server);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
     });
@@ -44,9 +41,7 @@ app.delete("/mcp", (_req, res) => {
   res.status(200).end();
 });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3027;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3026;
 app.listen(PORT, () => {
-  console.log(
-    `Building Footprints MCP server running on http://localhost:${PORT}/mcp`,
-  );
+  console.log(`Overture Maps MCP server running on http://localhost:${PORT}/mcp`);
 });

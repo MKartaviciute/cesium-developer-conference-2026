@@ -6,6 +6,7 @@
     "copy-cesium-assets": "node scripts/copy-cesium-assets.mjs",
     "postinstall": "node scripts/copy-cesium-assets.mjs",
     "dev": "next dev",
+    "start:all": "pnpm --include-workspace-root --parallel -r run dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

@@ -4,7 +4,7 @@
 
 ---
 
-## Section 1 — Introduction
+## Overview
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
@@ -12,11 +12,7 @@ Connecting tools to an AI agent is only half the work. The AI still has to decid
 
 Here is the surprising part: you do not fix this by writing more code. You fix it by writing better *English*. The AI reads your tool descriptions and system prompt the same way it reads any text, and decides what to do based on the words you chose. Change a single sentence and you change the behavior. This lab is about learning to write those sentences deliberately.
 
----
-
-## Section 2 — Goal
-
-In this lab you will:
+**In this lab you will:**
 
 - Edit tool descriptions and observe how tool selection changes.
 - Add global `TOOL_GUIDANCE` rules to the system prompt.
@@ -24,9 +20,7 @@ In this lab you will:
 
 By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rome"** should trigger a cleaner multi-step flow (search, navigate, and visualize).
 
----
-
-## Section 3 — What's already implemented
+### What's already implemented
 
 | Feature | Status | Source code |
 |---|---|---|
@@ -37,11 +31,8 @@ By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rom
 | System prompt | `ROLE` only, no `TOOL_GUIDANCE` yet | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
 | Tool descriptions | Present and editable | [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts), [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) |
 
-> [!NOTE]
->
-> We have added additional tools for you to accelerate the workshop. Take a look below at the list of tools.
-
-Tool inventory loaded in this lab:
+<details>
+<summary><strong>Full tool inventory loaded in this lab</strong> (click to expand)</summary>
 
 | Category | Tools |
 |---|---|
@@ -56,22 +47,21 @@ Tool inventory loaded in this lab:
 | MCP (POI) | `get_points_of_interest` |
 | MCP (Weather) | `get_current_weather`, `get_forecast`, `get_historical_weather` |
 
+</details>
+
 > [!IMPORTANT]
 >
 > The current system prompt only contains a `ROLE` description. There are no rules yet influencing how tools should be used.
 
 ---
 
-## Section 4 — Setup
+## Section 1 — Setup (start here)
 
-**Files you will modify in this lab:**
-- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
-- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
-- [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
-- [`packages/mcp-poi/src/tools/index.ts`](lab3_lab4/packages/mcp-poi/src/tools/index.ts) - optional challenge only
-- [`.env`](lab3_lab4/.env) - add
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
 
-You may close any active terminals from Lab 1 or Lab 2 at this time. Navigate to the `lab3_lab4` directory and prepare the code base:
+You may close any active terminals from Lab 1 or Lab 2. Navigate to the `lab3_lab4` directory and prepare the code base:
 
 ```bash
 cd workshop/lab3_lab4
@@ -81,15 +71,25 @@ pnpm install
 Add [`.env`](lab3_lab4/.env) next to [`.env.example`](lab3_lab4/.env.example) (you may copy this from the previous labs):
 
 ```env
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=your_key_here
 AI_BASE_URL=
 AI_MODEL=gpt-5.4
 
 # Optional
-CESIUM_ION_ACCESS_TOKEN=...
+CESIUM_ION_ACCESS_TOKEN=
 ```
 
-### Start all processes (3 separate terminals)
+### Start all processes
+
+This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
+
+```bash
+cd workshop/lab3_lab4
+pnpm start:all
+```
+
+<details>
+<summary>Prefer three separate terminals? (click to expand)</summary>
 
 ```bash
 # Terminal 1 - POI server (port 3001)
@@ -109,6 +109,8 @@ cd workshop/lab3_lab4
 pnpm dev
 ```
 
+</details>
+
 The app auto-connects to both MCP servers through `src/lib/mcp-servers.config.ts`.
 
 ![Lab 3 starting view — 42 Cesium tools and 4 MCP tools](images/lab3_starting_state.gif)
@@ -117,9 +119,16 @@ The app auto-connects to both MCP servers through `src/lib/mcp-servers.config.ts
 >
 > In the tools panel, verify you can see **42 Cesium tools** and **4 MCP tools** before starting experiments.
 
+**Files you will modify in this lab:**
+- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
+- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
+- [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
+- the MCP tool-definitions file [`mcp-poi/src/tools/poi-tools.ts`](lab3_lab4/packages/mcp-poi/src/tools/poi-tools.ts) - optional challenge only
+- [`.env`](lab3_lab4/.env) - add
+
 ---
 
-## Section 5 — Verify baseline behavior
+## Section 2 — Verify baseline behavior
 
 > [!TIP]
 >
@@ -135,7 +144,7 @@ This is expected. We have the tools, but orchestration is limited.
 
 ---
 
-## Section 6 — Tool descriptions drive behavior
+## Section 3 — Tool descriptions drive behavior
 
 Tool descriptions influence both:
 - **when** a tool is chosen
@@ -239,7 +248,7 @@ Restore the original description after testing.
 
 ---
 
-## Section 7 — Orchestrating tool chains with your system prompt
+## Section 4 — Orchestrating tool chains with your system prompt
 
 Now we will add global behavior rules that can span multiple tools.
 
@@ -281,7 +290,7 @@ Save, reload, and run the same prompt again.
 
 ---
 
-## Section 8 — A completed example
+## Section 5 — A completed example
 
 After some trial and error, your `system-prompt.ts` may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
 
@@ -313,7 +322,7 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 
 ---
 
-## Section 9 — When to use tool descriptions vs system prompt
+## Section 6 — When to use tool descriptions vs system prompt
 
 | Use tool descriptions for... | Use the system prompt for... |
 |---|---|
@@ -325,6 +334,9 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 ---
 
 ## Bonus — Behavior shaping and tool chain orchestration
+
+<details>
+<summary><strong>Optional deep dive: behavior shaping, ROLE personas & safety policy</strong> (click to expand)</summary>
 
 System prompts do two things in agentic applications:
 
@@ -509,8 +521,10 @@ Reload and run the same prompt again. **With `SAFEGUARDS`:** the model should li
 >
 > Safety rules belong in their own named block (`SAFEGUARDS`), separate from `TOOL_GUIDANCE`. This makes them easy to audit, update, and reuse across agents without touching the orchestration logic.
 
+</details>
+
 ---
 
-## Section 9 — What's next
+## Section 7 — What's next
 
 In [**Lab 4 — Free exploration with public datasets**](LAB_4_challenge.md), you will combine datasets and tool-chaining patterns to explore more complex geospatial requests and generate your own unique insights projected onto the Cesium globe.

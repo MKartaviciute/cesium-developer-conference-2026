@@ -3,7 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { registerHdxTools } from "./tools/index.js";
+import { registerHdxTools } from "./tools/hdx-tools.js";
 
 const app = express();
 

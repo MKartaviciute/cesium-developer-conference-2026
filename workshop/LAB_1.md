@@ -4,19 +4,15 @@
 
 ---
 
-## Section 1 — Introduction
+## Overview
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
 Right now the AI is like a GPS that can describe directions but cannot actually steer the car. The moment you give it a *tool* — a function it is allowed to call — it stops being a text generator and starts being an agent that acts on the world. This lab adds the very first tool: the ability to move the camera. One tool is all it takes to cross that line.
 
----
+We are starting with the 3D globe and chat already built and running. The agent can answer questions, but there is no meaningful connection between it and the globe yet.
 
-## Section 2 — Goal
-
-In this lab we are starting with the 3D globe and chat already built and running. However, there is no meaningful connection between the chat agent and the globe. The agent can answer questions, but it cannot control the globe.
-
-In this lab you will:
+**In this lab you will:**
 
 - Create a camera helper that wraps the core CesiumJS function call.
 - Define a `flyTo` AI tool that calls that helper.
@@ -26,9 +22,7 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 
 ![Completed Lab 1: typing "Fly to Paris" in the chat animates the globe camera to Paris](images/lab1_complete.gif)
 
----
-
-## Section 3 — What's already implemented
+**What's already implemented:**
 
 | Feature | Status | Source code |
 |---|---|---|
@@ -36,20 +30,17 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 | AI chat panel | Running | [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx) |
 | Cesium Tools panel | Ready - currently shows "No tools wired yet" | [src/components/cesium/CesiumToolsPanel.tsx](lab1_lab2/src/components/cesium/CesiumToolsPanel.tsx) |
 | Status bar | Visible at the bottom | [src/components/layout/StatusBar.tsx](lab1_lab2/src/components/layout/StatusBar.tsx) |
-| Cesium camera tool | Not wired yet - you will complete this | [src/lib/ai/tools/cesium/index.ts](lab1_lab2/src/lib/ai/tools/cesium/index.ts) |
+| Cesium camera tool | Not wired yet - you will complete this | Cesium tools barrel: [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) |
 
 ---
 
-## Section 4 — Setup
+## Section 1 — Setup (start here)
 
-**Files you will modify in this lab:**
-- [`.env`](lab1_lab2/.env) - add (copy from `.env.example`)
-- [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - pre-populated (no edits needed)
-- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) - uncomment (pre-populated)
-- [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) - edit (replace stub with import)
-- [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (wire tools into chat)
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: Start everything (app + POI server)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
 
-All of our work for this lab will take place inside the `lab1_lab2` directory. Switch to that directory in your terminal and install our node dependencies.
+All of our work for this lab takes place inside the `lab1_lab2` directory. Switch to that directory in your terminal and install the node dependencies:
 
 ```bash
 cd workshop/lab1_lab2
@@ -68,12 +59,12 @@ Then open `.env` and fill in your API key (provided during the workshop):
 # Optional — some imagery/terrain features require a Cesium Ion token
 CESIUM_ION_ACCESS_TOKEN=your_token_here
 
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=your_key_here
 AI_BASE_URL=
 AI_MODEL=gpt-5.4
 ```
 
-Now we can run the app. Execute the following command and open a new browser tab to http://localhost:3000.
+Now run the app and open a new browser tab to http://localhost:3000:
 
 ```bash
 pnpm dev # → http://localhost:3000
@@ -81,11 +72,18 @@ pnpm dev # → http://localhost:3000
 
 > [!IMPORTANT]
 >
-> Do not close the terminal window where you just ran these commands to keep the dev server running while you complete the lab.
+> Keep this terminal (or the VS Code task) running so the dev server stays up while you complete the lab.
+
+**Files you will modify in this lab:**
+- [`.env`](lab1_lab2/.env) - add (copy from `.env.example`)
+- [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - pre-populated (no edits needed)
+- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) - uncomment (pre-populated)
+- the Cesium tools **barrel** file [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) - edit (replace stub with import)
+- [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (wire tools into chat)
 
 ---
 
-## Section 5 — Verify the baseline functionality
+## Section 2 — Verify the baseline functionality
 
 In the chat panel, type:
 
@@ -105,7 +103,7 @@ Back in the app, look at the bottom left corner and find the status bar for MCP 
 
 ---
 
-## Section 6 — Review the camera helper
+## Section 3 — Review the camera helper
 
 Open [**`src/lib/cesium/camera.ts`**](lab1_lab2/src/lib/cesium/camera.ts) and review the pre-populated code. It exports a single `flyToLocation` function that wraps the CesiumJS `camera.flyTo` API:
 
@@ -140,18 +138,18 @@ export async function flyToLocation(
 }
 ```
 
-No edits are needed here. Continue to Section 7.
+No edits are needed here. Continue to Section 4.
 
 This is the first layer we are adding on top of the CesiumJS API to translate the API into something our LLM agent can understand. The LLM can't pull off miracles on its own, but maybe if we give it the right tools...
 
 ---
 
-## Section 7 — Define the AI tool
+## Section 4 — Define the AI tool
 
-A stub already exists in **[src/lib/ai/tools/cesium/index.ts](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L10)** with an empty implementation:
+A stub already exists in the Cesium tools **barrel** file [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L10) (full path `src/lib/ai/tools/cesium/index.ts`) with an empty implementation:
 
 ```typescript
-// Current stub in src/lib/ai/tools/cesium/index.ts
+// Current stub in cesium/index.ts (src/lib/ai/tools/cesium/index.ts)
 function createCameraTools(_viewerRef: RefObject<Viewer | null>): Record<string, Tool> {
   // TODO (Lab 1): Implement your camera tools here
   return {};
@@ -218,7 +216,7 @@ export function createCameraTools(
 
 `createCameraTools` returns an object containing several `tools`. Take a moment to study the fields inside the `flyTo: Tool` object. Notice the natural language `description` of what the tool does. Notice the descriptions of each of the input parameters in `inputSchema` and the rules specifying what type the inputs have and whether or not they are optional. Keep this in mind as we will repeat this pattern soon to add more tools.
 
-### Step 2 — Update [src/lib/ai/tools/cesium/index.ts](lab1_lab2/src/lib/ai/tools/cesium/index.ts)
+### Step 2 — Update the Cesium tools barrel [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts)
 
 Completely remove the local `createCameraTools` stub function and add the following import pointing to your real implementation in `camera-tools.ts`:
 
@@ -234,9 +232,15 @@ Completely remove the local `createCameraTools` stub function and add the follow
 - }
 ```
 
+**Copy-paste version** — delete the stub function entirely and add this single import at the top of `cesium/index.ts`:
+
+```typescript
+import { createCameraTools } from "./camera-tools";
+```
+
 ---
 
-## Section 8 — Connect the tool to the LLM
+## Section 5 — Connect the tool to the LLM
 
 Open **[src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx)**.
 
@@ -264,9 +268,22 @@ export function ChatPanel() {
 });
 ```
 
+**Copy-paste version** — after the edit, the start of `ChatPanel` should read:
+
+```typescript
+export function ChatPanel() {
+  // Add required scaffolding to make tools available to the chat component.
+  const { viewerRef } = useCesiumViewer();
+  const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
+  const { messages, status, error, sendMessage, abort, retry } = useAIChat({
+    tools,
+  });
+  const { isOnline } = useNetworkStatus();
+```
+
 ---
 
-## Section 9 — Test out the tool
+## Section 6 — Test out the tool
 
 Make sure all your file edits are saved. Type **"Fly to Paris"** again. The globe should smoothly animate to Paris.
 
@@ -294,7 +311,10 @@ Congrats! The globe now moves because the LLM agent can call the `flyTo` tool an
 
 ---
 
-## Section 10 — Tool descriptions matter
+## Section 7 — Optional experiments & bonus
+
+<details>
+<summary><strong>Tool descriptions matter</strong> — experiment with the <code>description</code> field (click to expand)</summary>
 
 The `description` field is what the LLM reads to decide **when** to call a tool. It contains a 'trigger list' of phrases that have likely mappings to the tool.
 
@@ -302,9 +322,10 @@ The `description` field is what the LLM reads to decide **when** to call a tool.
 - Change the `altitude` description. Does the model pick different altitudes for cities vs. continents?
 - Make the description more restrictive, for example: "only call this for capital cities." What happens if you try to fly to a small town?
 
----
+</details>
 
-## BONUS — Zero-parameter `resetCamera` tool
+<details>
+<summary><strong>BONUS — Zero-parameter <code>resetCamera</code> tool</strong> (click to expand)</summary>
 
 A tool doesn't need parameters to be useful. Adding a **zero-parameter** `resetCamera` tool proves that the LLM's tool-selection is driven entirely by the `description` field — no input schema gymnastics required.
 
@@ -348,8 +369,10 @@ The globe should animate back to its default position every time — even though
 >
 > **Teaching moment:** The LLM doesn't need coordinates or numbers to decide which tool to call. A well-written `description` is enough. This is a powerful design principle — keep tool selection logic in the description, not the schema.
 
+</details>
+
 ---
 
-## Section 11 — What's next
+## Section 8 — What's next
 
 In [**Lab 2**](LAB_2.md), you will build an external MCP server and connect it so the AI can call your custom tools alongside Cesium tools.

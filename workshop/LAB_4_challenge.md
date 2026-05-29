@@ -4,7 +4,7 @@
 
 ---
 
-## Section 1 — Introduction
+## Overview
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
@@ -12,15 +12,9 @@ Labs 1–3 gave you the mechanics. Lab 4 is yours: take what you've built, pick 
 
 > *"Discovery consists of seeing what everybody has seen and thinking what nobody has thought."* — Albert von Szent-Györgyi
 
-What you build here reflects your curiosity, your domain, and your instincts. There is no single correct answer.
-
----
-
-## Section 2 — Goal
-
 Lab 4 is open-ended. By now, your app has Cesium tools, MCP support, and prompt rules that can coordinate multi-step behavior. Now we'd like to see you express your creativity to generate some unique AI-powered insights and show us your findings in a 3D geospatial context.
 
-In this lab you will:
+**In this lab you will:**
 
 - Explore real public datasets.
 - Build or extend at least one MCP server.
@@ -33,11 +27,9 @@ Some experiments might lead to a polished demo, others to an unexpected result o
 - POI accessibility by region,
 - or something entirely your own.
 
-If you need a starting point, [Section 6](#section-6--need-inspiration-start-here) has some ideas.
+If you need a starting point, [Section 3](#section-3--need-inspiration-start-here) has some ideas.
 
----
-
-## Section 3 — What's already implemented
+### What's already implemented
 
 | Feature | Status | Source code |
 |---|---|---|
@@ -53,13 +45,11 @@ If you need a starting point, [Section 6](#section-6--need-inspiration-start-her
 
 ---
 
-## Section 4 — Setup
+## Section 1 — Setup (start here)
 
-**Files you may modify in this lab:**
-- `packages/mcp-[your-topic]/` - create or extend an MCP server package
-- `src/lib/mcp-servers.config.ts` - register your server
-- `src/lib/ai/prompts/system-prompt.ts` - optional behavior tuning
-- `src/lib/ai/tools/...` - optional tool-description tuning or create new tools
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
 
 Lab 4 uses the same workspace as Lab 3: `workshop/lab3_lab4`.
 
@@ -70,7 +60,17 @@ pnpm install
 
 Create `.env` (same format as previous labs) if needed.
 
-### Start all processes (3 terminals)
+### Start all processes
+
+This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
+
+```bash
+cd workshop/lab3_lab4
+pnpm start:all
+```
+
+<details>
+<summary>Prefer three separate terminals? (click to expand)</summary>
 
 ```bash
 # Terminal 1 - POI MCP server (port 3001)
@@ -90,15 +90,23 @@ cd workshop/lab3_lab4
 pnpm dev
 ```
 
+</details>
+
 The status bar should turn green when both MCP servers connect.
 
 > [!IMPORTANT]
 >
-> Keep all three terminals running while you experiment. If you do not need the POI MCP server or the Weather MCP server, you may remove them from `mcp-servers.config.ts` and close those two terminals.
+> Keep all processes running while you experiment. If you do not need the POI MCP server or the Weather MCP server, you may remove them from `mcp-servers.config.ts` and stop those two servers.
+
+**Files you may modify in this lab:**
+- `packages/mcp-[your-topic]/` - create or extend an MCP server package
+- `src/lib/mcp-servers.config.ts` - register your server
+- `src/lib/ai/prompts/system-prompt.ts` - optional behavior tuning
+- `src/lib/ai/tools/...` - optional tool-description tuning or create new tools
 
 ---
 
-## Section 5 — Verify baseline behavior
+## Section 2 — Verify baseline behavior
 
 Before creating anything new, verify the baseline stack works.
 
@@ -111,7 +119,7 @@ If those work, your baseline is ready for custom experiments.
 
 ---
 
-## Section 6 — Need inspiration? Start here
+## Section 3 — Need inspiration? Start here
 
 Not sure where to begin? Here are a few directions — browse, mix, or ignore them and bring your own idea.
 
@@ -121,7 +129,7 @@ Not sure where to begin? Here are a few directions — browse, mix, or ignore th
 
 ---
 
-## Section 7 — Share your experiments
+## Section 4 — Share your experiments
 
 <img src="images/ty-book.png" alt="Ty the tiler holding a book" width="120" align="right" />
 
@@ -136,7 +144,7 @@ Even if it's incomplete or a prompt that produced a funny result, share it anywa
 
 ---
 
-## Section 8 — Wrap-up
+## Section 5 — Wrap-up
 
 Across Labs 1-4, you have built a full browser-based geospatial agentic application:
 

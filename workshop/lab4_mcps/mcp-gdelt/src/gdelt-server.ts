@@ -1,10 +1,9 @@
-import "dotenv/config";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { registerOpenAqTools } from "./tools/index.js";
+import { registerGdeltTools } from "./tools/gdelt-tools.js";
 
 const app = express();
 
@@ -12,7 +11,6 @@ const allowedOrigin = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
 app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
-// 60 requests per minute per IP
 const mcpLimiter = rateLimit({
   windowMs: 60_000,
   max: 60,
@@ -20,10 +18,9 @@ const mcpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// SDK 1.29.0: stateless — fresh McpServer + transport per POST
 app.post("/mcp", mcpLimiter, async (req, res) => {
-  const server = new McpServer({ name: "openaq", version: "1.0.0" });
-  registerOpenAqTools(server);
+  const server = new McpServer({ name: "gdelt", version: "1.0.0" });
+  registerGdeltTools(server);
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
   await transport.handleRequest(req, res, req.body);
@@ -32,7 +29,7 @@ app.post("/mcp", mcpLimiter, async (req, res) => {
 app.get("/mcp", (_req, res) => { res.status(405).set("Allow", "POST, DELETE").end(); });
 app.delete("/mcp", (_req, res) => { res.status(200).end(); });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3018;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3015;
 app.listen(PORT, () => {
-  console.log(`OpenAQ MCP server running on http://localhost:${PORT}/mcp`);
+  console.log(`GDELT MCP server running on http://localhost:${PORT}/mcp`);
 });

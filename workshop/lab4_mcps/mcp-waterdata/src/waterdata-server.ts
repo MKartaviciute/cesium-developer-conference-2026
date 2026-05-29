@@ -3,7 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { registerEarthquakeTools } from "./tools/index.js";
+import { registerWaterdataTools } from "./tools/waterdata-tools.js";
 
 const app = express();
 
@@ -11,7 +11,6 @@ const allowedOrigin = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
 app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
-// 60 requests per minute per IP
 const mcpLimiter = rateLimit({
   windowMs: 60_000,
   max: 60,
@@ -19,23 +18,18 @@ const mcpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// SDK 1.29.0: stateless — fresh McpServer + transport per POST
 app.post("/mcp", mcpLimiter, async (req, res) => {
-  try {
-    const server = new McpServer({ name: "earthquake", version: "1.0.0" });
-    registerEarthquakeTools(server);
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  } catch {
-    if (!res.headersSent) res.status(500).json({ error: "Internal server error" });
-  }
+  const server = new McpServer({ name: "waterdata", version: "1.0.0" });
+  registerWaterdataTools(server);
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+  await server.connect(transport);
+  await transport.handleRequest(req, res, req.body);
 });
 
 app.get("/mcp", (_req, res) => { res.status(405).set("Allow", "POST, DELETE").end(); });
 app.delete("/mcp", (_req, res) => { res.status(200).end(); });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3006;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3009;
 app.listen(PORT, () => {
-  console.log(`Earthquake MCP server running on http://localhost:${PORT}/mcp`);
+  console.log(`Waterdata MCP server running on http://localhost:${PORT}/mcp`);
 });
