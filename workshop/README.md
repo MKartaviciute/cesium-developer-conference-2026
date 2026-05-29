@@ -151,23 +151,7 @@ Agent:
 
 ### How the components connect
 
-```mermaid
-graph TD
-    subgraph BROWSER
-        CP["Chat Panel\nUser types message"]
-        CJS["CesiumJS 3D Viewer\nGlobe · Terrain · Tiles\nEntities · Imagery · Camera · Clock"]
-        subgraph AGENT["AI AGENT (Vercel AI SDK)"]
-            SP["System Prompt"] --> TL["Tool Loop"]
-            TL --> TOOLS["Tools: flyTo · addLabel · addPolygon · setClock\nlistEntities · setTerrain · loadGeoJson"]
-            TL --> MCP_C["MCP Client"]
-        end
-        CP -->|user message| AGENT
-        TOOLS -->|direct API calls| CJS
-    end
-
-    AGENT -->|HTTPS| LLM["LLM Provider API\nOpenAI / Anthropic"]
-    MCP_C -->|HTTP MCP| MCPS["MCP Servers\nWeather · POI\nlocalhost:300x"]
-```
+![How the components connect](images/components-diagram.png)
 
 > [!TIP]
 >

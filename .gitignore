@@ -1,24 +1,28 @@
 # Dependencies
 node_modules/
+.pnp
+.pnp.*
 
 # Next.js build output
 .next/
 out/
+next-env.d.ts
 
 # Production build
 build/
 dist/
+*.tsbuildinfo
 
-# Cesium assets copied into public
+# CesiumJS distribution (copied during install, not source)
 **/public/cesium/
-
-# Generated Next.js types
-next-env.d.ts
 
 # Environment variables
 .env
 .env.local
-.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
 
 # Logs
 *.log
@@ -27,6 +31,23 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS files
+# Testing
+coverage/
+.nyc_output/
+
+# Cache
+.turbo/
+.vercel/
+.cache/
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
