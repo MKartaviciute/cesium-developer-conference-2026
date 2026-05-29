@@ -111,7 +111,7 @@ pnpm dev
 
 </details>
 
-The app auto-connects to both MCP servers through `src/lib/mcp-servers.config.ts`.
+The app auto-connects to both MCP servers through [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts).
 
 ![Lab 3 starting view — 42 Cesium tools and 4 MCP tools](images/lab3_starting_state.gif)
 
@@ -189,7 +189,12 @@ Expected behavior: marker is created, but camera may not move automatically.
 
 #### Step 3 - Restore original description
 
-Put the original follow-up instruction back before continuing.
+Put the original `addEntity` description back before continuing:
+
+```typescript
+description:
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.",
+```
 
 > [!TIP]
 >
@@ -238,7 +243,12 @@ Save, reload, and retry:
 
 Expected behavior: cleaner selection of `get_points_of_interest` without redundant navigation.
 
-Restore the original description after testing.
+Restore the original `flyTo` description after testing:
+
+```typescript
+description:
+  "Fly the camera smoothly to a geographic location on the globe. Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.",
+```
 
 ![LLM asked to "Show me museums near Paris" responds by only calling get_points_of_interest tool and responding with text. No other tools are invoked.](images/lab3_flyto_exclusion_rule.gif)
 
@@ -330,6 +340,10 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 | Parameter expectations/defaults | Global response style/tone |
 | Exclusions ("do not use for X") | Cross-tool policy ("act first, then summarize") |
 | Follow-up instructions ("after success, call X") | Global state, list, and retry behavior |
+
+> [!TIP]
+>
+> **Token cost of tools:** Every tool definition consumes tokens on every request, even if never called. With 46 tools loaded, this is already a significant baseline cost. If you're only experimenting with a subset, comment out unused tool registrations — fewer tools means cheaper requests and less routing confusion. This matters most in Lab 4 when you add even more MCP servers.
 
 ---
 
@@ -526,5 +540,12 @@ Reload and run the same prompt again. **With `SAFEGUARDS`:** the model should li
 ---
 
 ## Section 7 — What's next
+
+> [!TIP]
+>
+> **Want to learn more?**
+> - **Token budgeting & deferred tool loading** — with 46+ tools loaded, every request carries significant baseline cost. Load tool definitions lazily so the model only sees what it needs per turn. For quick savings, remove or comment out tool registrations you don't need — fewer tools means cheaper requests and less routing confusion. Example: [OpenAI Tool Search](https://developers.openai.com/api/docs/guides/tools-tool-search).
+> - **Skills — reusable prompt packages** — bundle tool definitions and instructions into versioned, shareable units that agents load on demand. Example: [OpenAI Skills](https://developers.openai.com/api/docs/guides/tools-skills), [Agent Skills standard](https://agentskills.io/home).
+> - **Conditional tool filtering** — only register the tools relevant to the current context instead of exposing everything upfront. In any SDK you can filter the tool array per request; some providers also offer built-in primitives (e.g. OpenAI [Namespaces](https://developers.openai.com/api/docs/guides/function-calling#defining-namespaces)).
 
 In [**Lab 4 — Free exploration with public datasets**](LAB_4_challenge.md), you will combine datasets and tool-chaining patterns to explore more complex geospatial requests and generate your own unique insights projected onto the Cesium globe.

@@ -2,24 +2,27 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { searchPois } from "../overpass.js";
 
-// TODO (Lab 2 — Section 5, Step 3): Implement registerPoiTools.
-//
-// This function registers the get_points_of_interest tool on the MCP server.
-// Define: tool name, natural language description, input schema (latitude,
-// longitude, type, radius), and an execute function that calls searchPois().
-//
-// Uncomment the block below to complete the implementation:
+/*
+ * TODO (Lab 2 — Section 2, Step 3): Implement registerPoiTools.
+ *
+ * This function registers the get_points_of_interest tool on the MCP server.
+ * Define: tool name, natural language description, input schema (latitude,
+ * longitude, type, radius), and an execute function that calls searchPois().
+ *
+ * To activate it, **UNCOMMENT THE BLOCK BELOW** 👇 by removing the leading `// `
+ */
 
 // export function registerPoiTools(server: McpServer) {
 //   server.registerTool(
-//     // Tool name exposed over MCP.
+//     /* Tool name exposed over MCP. */
 //     "get_points_of_interest",
 //     {
-//       // Tool description used by the LLM for intent matching.
+//       /* Tool description used by the LLM for intent matching. */
 //       description:
 //         "Search for real-world points of interest near a location using OpenStreetMap data. " +
 //         "Returns name, coordinates, and tags for each result. " +
 //         "Supported types include: museum, attraction, monument, restaurant, cafe, park, hotel, viewpoint, artwork, theatre.",
+//       /* Input schema defines arguments and descriptions for the model. */
 //       inputSchema: {
 //         latitude: z.number().describe("Center latitude (e.g. 48.8566 for Paris)"),
 //         longitude: z.number().describe("Center longitude (e.g. 2.3522 for Paris)"),
@@ -35,6 +38,7 @@ import { searchPois } from "../overpass.js";
 //       },
 //     },
 //     async ({ latitude, longitude, type, radius }) => {
+//       /* Call the Overpass client and return the results as MCP text content. */
 //       const results = await searchPois(latitude, longitude, type, radius);
 //       return {
 //         content: [

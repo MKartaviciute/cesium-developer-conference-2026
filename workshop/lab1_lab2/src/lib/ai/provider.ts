@@ -7,7 +7,7 @@ import type { LanguageModel } from "ai";
 export type AIProvider = "openai" | "anthropic";
 
 export const DEFAULT_MODELS: Record<AIProvider, string> = {
-  openai: "gpt-4o-mini",
+  openai: "gpt-5.4",
   anthropic: "claude-3-5-sonnet-20241022",
 };
 
@@ -16,7 +16,7 @@ export const DEFAULT_MODELS: Record<AIProvider, string> = {
  *
  * Variables are exposed to the browser via the `env` block in next.config.ts:
  *   AI_PROVIDER  — "openai" (default) or "anthropic"
- *   AI_MODEL     — optional override (e.g. "gpt-4o", "claude-3-5-sonnet-20241022")
+ *   AI_MODEL     — optional override (e.g. "gpt-5.4", "claude-3-5-sonnet-20241022")
  *   AI_BASE_URL  — optional custom endpoint (Azure AI Foundry, local proxy, etc.)
  *   OPENAI_API_KEY / ANTHROPIC_API_KEY — the provider API key
  */

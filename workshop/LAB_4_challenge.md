@@ -1,6 +1,6 @@
 # Lab 4 — Free exploration with public datasets
 
-**Time:** ~25 minutes
+**Time:** ~20 minutes
 
 ---
 
@@ -29,15 +29,19 @@ Some experiments might lead to a polished demo, others to an unexpected result o
 
 If you need a starting point, [Section 3](#section-3--need-inspiration-start-here) has some ideas.
 
+> [!TIP]
+>
+> **Start here, keep going later.** Lab 4 is open-ended on purpose — don't worry about "finishing" it during the session. Pick one small idea, get it working, and have fun. Everything you build here (and all the reference servers in [`workshop/lab4_mcps/`](lab4_mcps/)) is included in the workshop files, so you can keep exploring long after the workshop ends.
+
 ### What's already implemented
 
 | Feature | Status | Source code |
 |---|---|---|
-| Cesium toolset | 42 tools pre-wired | `src/lib/ai/tools/cesium/` |
-| MCP POI server | Pre-wired (`get_points_of_interest`) | `packages/mcp-poi/` |
-| MCP Weather server | Pre-wired (`get_current_weather`, `get_forecast`, `get_historical_weather`) | `packages/mcp-weather/` |
-| MCP connection config | POI + Weather already registered | `src/lib/mcp-servers.config.ts` |
-| Prompt orchestration | Uses your Lab 3 system-prompt updates | `src/lib/ai/prompts/system-prompt.ts` |
+| Cesium toolset | 42 tools pre-wired | [`src/lib/ai/tools/cesium/`](lab3_lab4/src/lib/ai/tools/cesium/) |
+| MCP POI server | Pre-wired (`get_points_of_interest`) | [`packages/mcp-poi/`](lab3_lab4/packages/mcp-poi/) |
+| MCP Weather server | Pre-wired (`get_current_weather`, `get_forecast`, `get_historical_weather`) | [`packages/mcp-weather/`](lab3_lab4/packages/mcp-weather/) |
+| MCP connection config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
+| Prompt orchestration | Uses your Lab 3 system-prompt updates | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
 
 > [!NOTE]
 >
@@ -96,13 +100,17 @@ The status bar should turn green when both MCP servers connect.
 
 > [!IMPORTANT]
 >
-> Keep all processes running while you experiment. If you do not need the POI MCP server or the Weather MCP server, you may remove them from `mcp-servers.config.ts` and stop those two servers.
+> Keep all processes running while you experiment. If you do not need the POI MCP server or the Weather MCP server, you may remove them from [`mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) and stop those two servers.
+
+> [!TIP]
+>
+> **Token cost of tools:** Every tool definition consumes tokens on every request, even if never called. As you add more MCP servers, the baseline cost per request grows. If you're focused on a specific experiment, consider commenting out Cesium tool categories you don't need (e.g., animation, clock, terrain) in the [tool registration](lab3_lab4/src/lib/ai/tools/cesium/index.ts) — fewer tools means cheaper requests and better routing accuracy.
 
 **Files you may modify in this lab:**
 - `packages/mcp-[your-topic]/` - create or extend an MCP server package
-- `src/lib/mcp-servers.config.ts` - register your server
-- `src/lib/ai/prompts/system-prompt.ts` - optional behavior tuning
-- `src/lib/ai/tools/...` - optional tool-description tuning or create new tools
+- [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) - register your server
+- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - optional behavior tuning
+- [`src/lib/ai/tools/cesium/`](lab3_lab4/src/lib/ai/tools/cesium/) - optional tool-description tuning or create new tools
 
 ---
 

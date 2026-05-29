@@ -14,6 +14,15 @@ Your primary purpose is to help users explore locations, visualize geospatial da
 You can add entities, layers, and tilesets to the globe, control the camera, manage time, and inspect the current viewer state.`;
 
 // ---------------------------------------------------------------------------
+// Tool guidance
+// ---------------------------------------------------------------------------
+
+// TODO (Lab 3 — Section 4): Add a TOOL_GUIDANCE block here with global rules
+// that apply across all tools, then include it in buildSystemPrompt() below:
+//   return [ROLE, TOOL_GUIDANCE].join("\n\n");
+// See LAB_3.md Section 4 for the exact content to add.
+
+// ---------------------------------------------------------------------------
 // Assembled system prompt
 // ---------------------------------------------------------------------------
 

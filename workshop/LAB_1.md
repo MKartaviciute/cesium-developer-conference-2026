@@ -20,6 +20,12 @@ We are starting with the 3D globe and chat already built and running. The agent 
 
 By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 
+> [!NOTE]
+>
+> **Two kinds of steps in this lab.** Throughout these labs, watch for these badges on each section:
+> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
+> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
+
 ![Completed Lab 1: typing "Fly to Paris" in the chat animates the globe camera to Paris](images/lab1_complete.gif)
 
 **What's already implemented:**
@@ -38,7 +44,9 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 
 > [!TIP]
 >
-> **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: Start everything (app + POI server)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
+> **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: App (port 3000)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
+>
+> Lab 1 only needs the app — don't start the POI server yet (that's Lab 2).
 
 All of our work for this lab takes place inside the `lab1_lab2` directory. Switch to that directory in your terminal and install the node dependencies:
 
@@ -50,8 +58,13 @@ pnpm install
 Add a new file called `.env` next to `.env.example`. The easiest way is to copy `.env.example` and rename it:
 
 ```bash
-cp .env.example .env
+copy .env.example .env  # Windows
+# cp .env.example .env  # macOS/Linux
 ```
+
+> [!TIP]
+>
+> No terminal needed: in the VS Code file explorer, right-click `.env.example` → **Copy**, then right-click → **Paste**, and rename the copy to `.env`.
 
 Then open `.env` and fill in your API key (provided during the workshop):
 
@@ -91,7 +104,7 @@ In the chat panel, type:
 
 Notice the assistant responds with text, but the globe does not move.
 
-Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx#L59) and you will see `tools: {}`. This empty object tells us that no tools are registered yet.
+Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx) and find the `tools: {}` line (look for the `👇 LAB 1` markers). This empty object tells us that no tools are registered yet.
 
 Back in the app, look at the bottom left corner and find the status bar for MCP servers and tools. You can click on these to open a helpful debug panel describing what resources are currently connected to your LLM chat agent. Right now both lists should be empty.
 
@@ -104,6 +117,8 @@ Back in the app, look at the bottom left corner and find the status bar for MCP 
 ---
 
 ## Section 3 — Review the camera helper
+
+> 📖 **Review only** — read and understand this file. No edits needed.
 
 Open [**`src/lib/cesium/camera.ts`**](lab1_lab2/src/lib/cesium/camera.ts) and review the pre-populated code. It exports a single `flyToLocation` function that wraps the CesiumJS `camera.flyTo` API:
 
@@ -146,6 +161,8 @@ This is the first layer we are adding on top of the CesiumJS API to translate th
 
 ## Section 4 — Define the AI tool
 
+> ✏️ **You implement** — you uncomment a tool and edit the barrel file in this section.
+
 A stub already exists in the Cesium tools **barrel** file [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L10) (full path `src/lib/ai/tools/cesium/index.ts`) with an empty implementation:
 
 ```typescript
@@ -162,7 +179,11 @@ You will replace that stub by creating a new tool file and importing it.
 
 This file is the container for all tools we want to implement related to camera control. It is pre-populated with a skeleton and a commented-out implementation.
 
-**Uncomment the `createCameraTools` function** (remove the `//` prefix from each line in the commented block). After uncommenting, your file should look like this:
+**Uncomment the `createCameraTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
+
+> [!TIP]
+>
+> **Fast way to uncomment in VS Code:** select every line of the commented block, then press `Ctrl+/` (`Cmd+/` on macOS) to toggle the comments off all at once. (Or simply replace the whole file's contents with the code block below.)
 
 ```typescript
 import { tool } from "ai";
@@ -175,14 +196,14 @@ export function createCameraTools(
   viewerRef: RefObject<CesiumType.Viewer | null>,
 ) {
   return {
-    // The flyTo tool object - the only camera tool for now.
+    /* The flyTo tool object - the only camera tool for now. */
     flyTo: tool({
-      // Natural language description of the flyTo tool.
+      /* Natural language description of the flyTo tool. */
       description:
         "Fly the camera to a geographic location. " +
         "Use when the user asks to navigate, go to, show, or visit a place.",
-      // Defines the input parameters for this tool.
-      // z (or zod) is the library used to dynamically define the types.
+      /* Defines the input parameters for this tool.
+         z (or zod) is the library used to dynamically define the types. */
       inputSchema: z.object({
         latitude: z.number().describe("Decimal degrees, positive = north"),
         longitude: z.number().describe("Decimal degrees, positive = east"),
@@ -198,9 +219,9 @@ export function createCameraTools(
           .string()
           .describe("Human-readable name shown in the result card"),
       }),
-      // The javascript function that'll be called when the tool is called.
-      // This is a wrapper around the function you wrote earlier that
-      // includes some logic to check whether the viewer is ready.
+      /* The javascript function that'll be called when the tool is called.
+         This is a wrapper around the function you wrote earlier that
+         includes some logic to check whether the viewer is ready. */
       execute: async ({ latitude, longitude, altitude, duration }) => {
         const viewer = viewerRef.current;
         if (!viewer || viewer.isDestroyed()) {
@@ -232,19 +253,61 @@ Completely remove the local `createCameraTools` stub function and add the follow
 - }
 ```
 
-**Copy-paste version** — delete the stub function entirely and add this single import at the top of `cesium/index.ts`:
+**Copy-paste version** — to avoid mistakes when deleting the stub, you can replace the **entire contents** of `cesium/index.ts` with the following. The only change from the starter file is the first line (the import replaces the stub function):
 
 ```typescript
+"use client";
+
+import type { Tool } from "ai";
+import type { RefObject } from "react";
+import type { Viewer } from "cesium";
 import { createCameraTools } from "./camera-tools";
+
+export type CesiumToolCategoryKey = "camera";
+
+export interface CesiumToolGroup {
+  key: CesiumToolCategoryKey;
+  title: string;
+  tools: Record<string, Tool>;
+}
+
+/**
+ * Build Cesium tools grouped by their owning domain module.
+ *
+ * Lab 1 — Camera tools only.
+ */
+export function createCesiumToolGroups(
+  viewerRef: RefObject<Viewer | null>,
+): CesiumToolGroup[] {
+  return [
+    { key: "camera", title: "Camera", tools: createCameraTools(viewerRef) },
+  ];
+}
+
+/**
+ * Assembles all Cesium viewer tools into a single map.
+ */
+export function createCesiumTools(viewerRef: RefObject<Viewer | null>): Record<string, Tool> {
+  const groups = createCesiumToolGroups(viewerRef);
+  const tools: Record<string, Tool> = {};
+  for (const group of groups) {
+    Object.assign(tools, group.tools);
+  }
+  return tools;
+}
 ```
 
 ---
 
 ## Section 5 — Connect the tool to the LLM
 
-Open **[src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx)**.
+> ✏️ **You implement** — you edit `ChatPanel.tsx` in this section.
+
+Open **[src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx)**. The file has inline `👇 LAB 1` anchor markers showing exactly where each change goes.
 
 ### Step 1 — Add imports at the top
+
+Replace the `👇 LAB 1 — STEP 1` import marker with:
 
 ```typescript
 import { useMemo } from "react";

@@ -23,9 +23,7 @@ export interface CesiumToolGroup {
 /**
  * Build Cesium tools grouped by their owning domain module.
  *
- * Lab 1 — Camera tools only. Once you implement camera-tools.ts,
- * update the import statement at the top to use it:
- *   import { createCameraTools } from "./camera-tools";
+ * Lab 1 — Camera tools only.
  */
 export function createCesiumToolGroups(
   viewerRef: RefObject<Viewer | null>,

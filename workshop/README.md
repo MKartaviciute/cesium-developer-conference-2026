@@ -31,7 +31,6 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 
 | Requirement | Notes |
 |---|---|
-| **[Git](https://git-scm.com/)** | Needed to clone the workshop repo — repo link TBD. |
 | **[VS Code](https://code.visualstudio.com/)** | Download from [code.visualstudio.com](https://code.visualstudio.com/). |
 | **Node.js ≥ 22 LTS** | Download from [nodejs.org](https://nodejs.org/).<br>Check version with: `node --version`. |
 | **pnpm 9.15.5** | Install Node.js first.<br>`npm install -g pnpm@9.15.5`<br>(or run `corepack enable` and it will be installed automatically) |
@@ -49,7 +48,7 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 | 1 | [Lab 1 — Our first Cesium tool](LAB_1.md) | Create a `flyTo` camera tool from scratch. | 15 min |
 | 2 | [Lab 2 — Build an MCP server](LAB_2.md) | Build a points-of-interest (POI) MCP server and connect it to the agent. | 20 min |
 | 3 | [Lab 3 — System prompts and tool descriptions](LAB_3.md) | Shape agent behavior with `TOOL_GUIDANCE` and tool descriptions. | 20 min |
-| 4 | [Lab 4 — Free exploration with public datasets](LAB_4_challenge.md) | Explore public datasets.<br>Build your own MCP server(s).<br>Generate new AI insights.<br>Show us your creativity! | 25 min |
+| 4 | [Lab 4 — Free exploration with public datasets](LAB_4_challenge.md) | Explore public datasets.<br>Build your own MCP server(s).<br>Generate new AI insights.<br>Show us your creativity! | 20 min |
 
 > [!TIP]
 >
@@ -79,7 +78,9 @@ CESIUM_ION_ACCESS_TOKEN=    # optional
 
 > [!NOTE]
 >
-> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key.
+> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
+>
+> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ---
 
@@ -93,10 +94,15 @@ Each lab needs the Next.js app running, plus one or more MCP servers. You have t
 1. Open the Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS).
 2. Type **Tasks: Run Task** and press Enter.
 3. Pick the task for your lab:
-   - **Lab 1 & 2: Start everything (app + POI server)**
+   - **Lab 1 & 2: App (port 3000)** — Lab 1 only needs the app.
+   - **Lab 1 & 2: Start everything (app + POI server)** — use from Lab 2 onward.
    - **Lab 3 & 4: Start everything (app + POI + Weather)**
 
 VS Code starts every process in its own panel. To stop them, click the trash-can icon on each terminal panel (or run **Tasks: Terminate Task**).
+
+> [!IMPORTANT]
+>
+> In **Lab 1** you only need the app running — do **not** start the POI server yet. The POI server stays off until you build its tool in Lab 2, so starting it early (via "Start everything" or `pnpm start:all`) will show an error in that terminal. For Lab 1, use the **Lab 1 & 2: App (port 3000)** task or `pnpm dev`.
 
 > Run `pnpm install` once in the lab folder first (Option B step 1). You only need to do this a single time per lab folder.
 
@@ -107,8 +113,13 @@ From the lab folder, a single command starts the app and all of its MCP servers 
 ```bash
 cd workshop/lab1_lab2   # or workshop/lab3_lab4
 pnpm install            # first time only
-pnpm start:all
+pnpm dev                # Lab 1 only (app without MCP servers)
+pnpm start:all          # Lab 2 onward (app + all MCP servers)
 ```
+
+> [!IMPORTANT]
+>
+> In **Lab 1**, use `pnpm dev` instead of `pnpm start:all`. The POI server has no tools registered yet, so `start:all` will show an error in that terminal.
 
 Open http://localhost:3000 once everything is running. The status bar turns green when the MCP servers connect.
 
