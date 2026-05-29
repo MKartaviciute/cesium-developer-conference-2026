@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 import type {
   SetTerrainOutput,
   RemoveTerrainOutput,
@@ -29,7 +29,6 @@ export async function setTerrain(
   },
 ): Promise<SetTerrainOutput> {
   const { type, assetId, url, requestVertexNormals = false, requestWaterMask = false } = params;
-  const Cesium = await cesium();
 
   try {
     switch (type) {
@@ -74,13 +73,11 @@ export async function setTerrain(
 }
 
 export async function removeTerrain(viewer: Viewer): Promise<RemoveTerrainOutput> {
-  const Cesium = await cesium();
   viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
   return { success: true };
 }
 
 export async function getTerrainInfo(viewer: Viewer): Promise<GetTerrainOutput> {
-  const Cesium = await cesium();
   const provider = viewer.terrainProvider;
 
   let terrainType = "custom";

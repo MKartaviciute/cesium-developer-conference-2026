@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 import type { AddGeoJsonLayerOutput, RemoveLayerOutput } from "@/lib/ai/tools/cesium/schemas/data-source";
 
 function describeGeoJsonError(error: unknown): string {
@@ -34,8 +34,6 @@ export async function addGeoJsonLayer(
       message: "Provide either a GeoJSON URL or inline GeoJSON data.",
     };
   }
-
-  const Cesium = await cesium();
 
   try {
     const dataSource = await Cesium.GeoJsonDataSource.load((url ?? data)!, {

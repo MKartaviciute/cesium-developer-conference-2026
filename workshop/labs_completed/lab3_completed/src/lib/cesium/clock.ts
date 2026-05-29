@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 import type {
   SetTimeOutput,
   ClockControlOutput,
@@ -12,7 +12,6 @@ export async function setClockTime(
   viewer: Viewer,
   datetime: string,
 ): Promise<SetTimeOutput> {
-  const Cesium = await cesium();
   const julianDate = Cesium.JulianDate.fromIso8601(datetime);
   viewer.clock.currentTime = julianDate;
   viewer.clock.shouldAnimate = false;
@@ -33,7 +32,6 @@ export async function controlClock(
 ): Promise<ClockControlOutput> {
   const { action, currentTime, multiplier, shouldAnimate, clockRange, startTime, stopTime } = params;
   const clock = viewer.clock;
-  const Cesium = await cesium();
 
   if (action === "pause") {
     clock.shouldAnimate = false;
@@ -85,7 +83,6 @@ export async function setGlobeLighting(
   viewer.scene.globe.enableLighting = enableLighting;
 
   if (enableDynamicAtmosphere !== undefined) {
-    const Cesium = await cesium();
     viewer.scene.atmosphere.dynamicLighting = enableDynamicAtmosphere
       ? Cesium.DynamicAtmosphereLightingType.SUNLIGHT
       : Cesium.DynamicAtmosphereLightingType.NONE;

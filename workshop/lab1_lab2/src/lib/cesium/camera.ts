@@ -1,4 +1,4 @@
-import type * as CesiumType from "cesium";
+import * as Cesium from "cesium";
 
 /**
  * This file is pre-populated — no edits needed here.
@@ -6,9 +6,9 @@ import type * as CesiumType from "cesium";
  */
 
 /** Fly the camera to a lat/lon coordinate. */
-export async function flyToLocation(
+export function flyToLocation(
   // Reference to the 3D viewer - used to call CesiumJS functions.
-  viewer: CesiumType.Viewer,
+  viewer: Cesium.Viewer,
   // All input parameters required and optional for flyTo.
   params: {
     latitude: number;     // latitude in degrees
@@ -17,7 +17,6 @@ export async function flyToLocation(
     duration?: number;    // how long animation should last in seconds
   },
 ): Promise<void> {
-  const Cesium = await import("cesium");
   // Instantiate variables with defaults for optional parameters.
   const { latitude, longitude, altitude = 1_000_000, duration = 3 } = params;
 

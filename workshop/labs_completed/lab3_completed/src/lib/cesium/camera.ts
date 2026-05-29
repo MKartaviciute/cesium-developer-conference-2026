@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer } from "cesium";
-import { cesium } from "./cesium-loader";
 
 import type {
   FlyToOutput,
@@ -40,7 +40,6 @@ async function releaseCameraConstraints(viewer: Viewer): Promise<void> {
     viewer.trackedEntity = undefined;
   }
   // Release any lookAt lock (camera.lookAt sets a non-identity transform).
-  const Cesium = await cesium();
   if (!Cesium.Matrix4.equals(viewer.camera.transform, Cesium.Matrix4.IDENTITY)) {
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
   }
@@ -60,7 +59,6 @@ export async function flyToLocation(
 ): Promise<FlyToOutput> {
   const { latitude, longitude, altitude = 1_000, heading = 0, pitch = -90, duration = 3, name } = params;
   await releaseCameraConstraints(viewer);
-  const Cesium = await cesium();
 
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude),
@@ -92,7 +90,6 @@ export async function setCameraView(
 ): Promise<CameraSetViewOutput> {
   const { latitude, longitude, altitude = 1_000, heading = 0, pitch = -90, roll = 0 } = params;
   await releaseCameraConstraints(viewer);
-  const Cesium = await cesium();
 
   viewer.camera.setView({
     destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude),
@@ -121,7 +118,6 @@ export async function cameraLookAt(
   // Cancel any in-progress flight, stop orbit, and release any existing
   // lookAt lock before setting the new look-at target.
   await releaseCameraConstraints(viewer);
-  const Cesium = await cesium();
 
   viewer.camera.lookAt(
     Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude),
@@ -150,7 +146,6 @@ export async function startCameraOrbit(
   // Cancel any in-progress flyTo so the animation cannot override the orbit.
   viewer.camera.cancelFlight();
 
-  const Cesium = await cesium();
   const sign = direction === "counterclockwise" ? -1 : 1;
   const radiansPerSecond = Cesium.Math.toRadians(speed) * sign;
   let lastTime = Date.now();
@@ -183,7 +178,6 @@ export function stopCameraOrbit(viewer: Viewer): CameraStopOrbitOutput {
 }
 
 export async function getCameraPosition(viewer: Viewer): Promise<CameraGetPositionOutput> {
-  const Cesium = await cesium();
   const camera = viewer.camera;
   const carto = camera.positionCartographic;
 
@@ -292,7 +286,6 @@ export async function zoomTo(
   }
 
   await releaseCameraConstraints(viewer);
-  const Cesium = await cesium();
 
   try {
     await viewer.zoomTo(

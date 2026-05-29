@@ -1,7 +1,7 @@
 "use client";
 
+import * as Cesium from "cesium";
 import type { Viewer, Entity } from "cesium";
-import { cesium } from "./cesium-loader";
 import { orbitListeners } from "./camera";
 import type {
   AnimationCreateOutput,
@@ -73,8 +73,6 @@ export async function createAnimation(
     autoPlay = true,
     trackCamera = false,
   } = params;
-
-  const Cesium = await cesium();
 
   const property = new Cesium.SampledPositionProperty();
 
@@ -278,7 +276,6 @@ export async function updateAnimationPath(
   const entry = getAnimationMap(viewer).get(animationId);
   if (!entry) return { success: false, animationId };
 
-  const Cesium = await cesium();
   if (replacePositionSamples || appendPositionSamples) {
     const nextSamples = replacePositionSamples
       ? [...replacePositionSamples]
@@ -391,20 +388,18 @@ export function setCameraTracking(
   const entry = animMap.get(resolvedAnimationId);
   if (!entry) return { success: false, isTracking: false };
 
-  void cesium().then((Cesium) => {
-    if (!Cesium.Matrix4.equals(viewer.camera.transform, Cesium.Matrix4.IDENTITY)) {
-      viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-    }
+  if (!Cesium.Matrix4.equals(viewer.camera.transform, Cesium.Matrix4.IDENTITY)) {
+    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+  }
 
-    // viewFrom controls the default follow offset used by trackedEntity.
-    entry.entity.viewFrom = new Cesium.ConstantPositionProperty(
-      new Cesium.Cartesian3(
-        -range * Math.cos(Cesium.Math.toRadians(pitch)) * Math.cos(Cesium.Math.toRadians(heading)),
-        range * Math.cos(Cesium.Math.toRadians(pitch)) * Math.sin(Cesium.Math.toRadians(heading)),
-        range * Math.sin(-Cesium.Math.toRadians(pitch)),
-      ),
-    );
-  });
+  // viewFrom controls the default follow offset used by trackedEntity.
+  entry.entity.viewFrom = new Cesium.ConstantPositionProperty(
+    new Cesium.Cartesian3(
+      -range * Math.cos(Cesium.Math.toRadians(pitch)) * Math.cos(Cesium.Math.toRadians(heading)),
+      range * Math.cos(Cesium.Math.toRadians(pitch)) * Math.sin(Cesium.Math.toRadians(heading)),
+      range * Math.sin(-Cesium.Math.toRadians(pitch)),
+    ),
+  );
 
   viewer.trackedEntity = entry.entity;
   viewer.scene.requestRender();
