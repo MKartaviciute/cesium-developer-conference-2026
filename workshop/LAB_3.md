@@ -24,8 +24,8 @@ By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rom
 
 | Feature | Status | Source code |
 |---|---|---|
-| Cesium toolset | 42 tools pre-wired | [`src/lib/ai/tools/cesium/`](lab3_lab4/src/lib/ai/tools/cesium/) |
-| MCP toolset | 4 tools pre-wired<br>2 MCP servers<br>(POI + Weather) | [`packages/mcp-poi/`](lab3_lab4/packages/mcp-poi/), [`packages/mcp-weather/`](lab3_lab4/packages/mcp-weather/) |
+| Cesium toolset | 42 tools pre-wired | [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) |
+| MCP toolset | 4 tools pre-wired<br>2 MCP servers<br>(POI + Weather) | [`packages/mcp-poi/src/poi-server.ts`](lab3_lab4/packages/mcp-poi/src/poi-server.ts), [`packages/mcp-weather/src/weather-server.ts`](lab3_lab4/packages/mcp-weather/src/weather-server.ts) |
 | MCP server config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
 | Chat tool wiring | Cesium + MCP tools already merged in chat | [`src/components/chat/ChatPanel.tsx`](lab3_lab4/src/components/chat/ChatPanel.tsx) |
 | System prompt | `ROLE` only, no `TOOL_GUIDANCE` yet | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
@@ -123,7 +123,7 @@ The app auto-connects to both MCP servers through [`src/lib/mcp-servers.config.t
 - [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
 - [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
 - [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
-- the MCP tool-definitions file [`mcp-poi/src/tools/poi-tools.ts`](lab3_lab4/packages/mcp-poi/src/tools/poi-tools.ts) - optional challenge only
+- the MCP tool-definitions file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab3_lab4/packages/mcp-poi/src/tools/poi-tools.ts) - optional challenge only
 - [`.env`](lab3_lab4/.env) - add
 
 ---

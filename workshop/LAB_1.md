@@ -36,7 +36,7 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 | AI chat panel | Running | [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx) |
 | Cesium Tools panel | Ready - currently shows "No tools wired yet" | [src/components/cesium/CesiumToolsPanel.tsx](lab1_lab2/src/components/cesium/CesiumToolsPanel.tsx) |
 | Status bar | Visible at the bottom | [src/components/layout/StatusBar.tsx](lab1_lab2/src/components/layout/StatusBar.tsx) |
-| Cesium camera tool | Not wired yet - you will complete this | Cesium tools barrel: [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) |
+| Cesium camera tool | Not wired yet - you will complete this | Cesium tools barrel: [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) |
 
 ---
 
@@ -72,7 +72,7 @@ Then open `.env` and fill in your API key (provided during the workshop):
 # Optional — some imagery/terrain features require a Cesium Ion token
 CESIUM_ION_ACCESS_TOKEN=your_token_here
 
-OPENAI_API_KEY=your_key_here
+OPENAI_API_KEY=
 AI_BASE_URL=
 AI_MODEL=gpt-5.4
 ```
@@ -91,7 +91,7 @@ pnpm dev # → http://localhost:3000
 - [`.env`](lab1_lab2/.env) - add (copy from `.env.example`)
 - [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - pre-populated (no edits needed)
 - [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) - uncomment (pre-populated)
-- the Cesium tools **barrel** file [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) - edit (replace stub with import)
+- the Cesium tools **barrel** file [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) - edit (replace stub with import)
 - [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (wire tools into chat)
 
 ---
@@ -163,7 +163,7 @@ This is the first layer we are adding on top of the CesiumJS API to translate th
 
 > ✏️ **You implement** — you uncomment a tool and edit the barrel file in this section.
 
-A stub already exists in the Cesium tools **barrel** file [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L10) (full path `src/lib/ai/tools/cesium/index.ts`) with an empty implementation:
+A stub already exists in the Cesium tools **barrel** file [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L10) with an empty implementation:
 
 ```typescript
 // Current stub in cesium/index.ts (src/lib/ai/tools/cesium/index.ts)
@@ -237,7 +237,7 @@ export function createCameraTools(
 
 `createCameraTools` returns an object containing several `tools`. Take a moment to study the fields inside the `flyTo: Tool` object. Notice the natural language `description` of what the tool does. Notice the descriptions of each of the input parameters in `inputSchema` and the rules specifying what type the inputs have and whether or not they are optional. Keep this in mind as we will repeat this pattern soon to add more tools.
 
-### Step 2 — Update the Cesium tools barrel [`cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts)
+### Step 2 — Update the Cesium tools barrel [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts)
 
 Completely remove the local `createCameraTools` stub function and add the following import pointing to your real implementation in `camera-tools.ts`:
 

@@ -74,8 +74,8 @@ pnpm dev # -> http://localhost:3000
 - [`packages/mcp-poi/package.json`](lab1_lab2/packages/mcp-poi/package.json) - pre-populated (no edits needed)
 - [`packages/mcp-poi/tsconfig.json`](lab1_lab2/packages/mcp-poi/tsconfig.json) - pre-populated (no edits needed)
 - [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) - pre-populated (no edits needed)
-- the MCP **tool-definitions** file [`mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts) - uncomment (pre-populated)
-- the MCP **server entry point** [`mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) - pre-populated (no edits needed)
+- the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts) - uncomment (pre-populated)
+- the MCP **server entry point** [`packages/mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) - pre-populated (no edits needed)
 - [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) - edit (register your MCP server)
 - [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (merge MCP tools into chat)
 
@@ -143,7 +143,7 @@ No edits are needed here. Continue to Step 3.
 
 > 📖 **Review only** — read and understand this file. No edits needed.
 
-Open the MCP **server entry point** [`mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) (full path `packages/mcp-poi/src/poi-server.ts`) and review the pre-populated code. It creates an Express app that hosts a `/mcp` endpoint. Because MCP is an open standard, we can rely on public libraries from `@modelcontextprotocol/sdk` for most of the heavy lifting.
+Open the MCP **server entry point** [`packages/mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) and review the pre-populated code. It creates an Express app that hosts a `/mcp` endpoint. Because MCP is an open standard, we can rely on public libraries from `@modelcontextprotocol/sdk` for most of the heavy lifting.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -190,7 +190,7 @@ No edits are needed here. Continue to Step 4.
 
 Here we are defining the first tool on this MCP server. The syntax is slightly different from [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) in Lab 1, but the content should look familiar — a name, a description, input parameters with types, and an execute function.
 
-Open the MCP **tool-definitions** file [`mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts) (full path `packages/mcp-poi/src/tools/poi-tools.ts`). The file has a skeleton and a commented-out implementation.
+Open the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts). The file has a skeleton and a commented-out implementation.
 
 **Uncomment the `registerPoiTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
 
