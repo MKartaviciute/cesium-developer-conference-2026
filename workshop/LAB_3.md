@@ -1,6 +1,6 @@
 # Lab 3 — System prompts and tool descriptions
 
-**Time:** ~20 minutes
+**Time:** ~20 minutes | **Required workspace:** `workshop/lab3_lab4/` _(new workspace — separate from Labs 1 & 2)_
 
 ---
 
@@ -11,6 +11,8 @@
 Connecting tools to an AI agent is only half the work. The AI still has to decide, on its own, which tool to call, when, and in what order. Left without guidance it will make inconsistent choices — sometimes flying the camera before placing a marker, sometimes after, sometimes not at all.
 
 Here is the surprising part: you do not fix this by writing more code. You fix it by writing better *English*. The AI reads your tool descriptions and system prompt the same way it reads any text, and decides what to do based on the words you chose. Change a single sentence and you change the behavior. This lab is about learning to write those sentences deliberately.
+
+In Labs 1–2 you built tools from the ground up. Now the perspective flips: this lab starts with a rich toolkit already assembled (42 Cesium tools + 4 MCP tools), and the focus shifts to **orchestration** — teaching the agent which tools to use, when, and in what order, entirely through natural language.
 
 **In this lab you will:**
 
@@ -57,23 +59,31 @@ By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rom
 
 ## Section 1 — Setup (start here)
 
+> [!IMPORTANT]
+>
+> **This is a new workspace.** Labs 3 & 4 use `workshop/lab3_lab4/` — a separate directory from `lab1_lab2/`. You do not need any code from Labs 1–2; everything is pre-wired here. Close any active Lab 1 or Lab 2 terminals before starting.
+
 > [!TIP]
 >
 > **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
 
-You may close any active terminals from Lab 1 or Lab 2. Navigate to the `lab3_lab4` directory and prepare the code base:
+> [!TIP]
+>
+> **Token cost of tools:** This workspace loads 46 tools on every request (42 Cesium + 4 MCP). That is a significant baseline token cost even before any tool is called. If you are experimenting with only a subset of tools, comment out unused tool registrations in [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) — fewer tools means cheaper requests and less routing confusion.
+
+Navigate to the `lab3_lab4` directory and prepare the code base:
 
 ```bash
 cd workshop/lab3_lab4
 pnpm install
 ```
 
-Add [`.env`](lab3_lab4/.env) next to [`.env.example`](lab3_lab4/.env.example) (you may copy this from the previous labs):
+Copy [`.env.example`](lab3_lab4/.env.example) to [`.env`](lab3_lab4/.env) (or reuse the values from Lab 1):
 
 ```env
 OPENAI_API_KEY=your_key_here
-AI_BASE_URL=
-AI_MODEL=gpt-5.4
+AI_BASE_URL=your_base_url_here
+AI_MODEL=your_model_name_here
 
 # Optional
 CESIUM_ION_ACCESS_TOKEN=
@@ -340,10 +350,6 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 | Parameter expectations/defaults | Global response style/tone |
 | Exclusions ("do not use for X") | Cross-tool policy ("act first, then summarize") |
 | Follow-up instructions ("after success, call X") | Global state, list, and retry behavior |
-
-> [!TIP]
->
-> **Token cost of tools:** Every tool definition consumes tokens on every request, even if never called. With 46 tools loaded, this is already a significant baseline cost. If you're only experimenting with a subset, comment out unused tool registrations — fewer tools means cheaper requests and less routing confusion. This matters most in Lab 4 when you add even more MCP servers.
 
 ---
 

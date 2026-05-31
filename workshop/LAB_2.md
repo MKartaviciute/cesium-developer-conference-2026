@@ -1,6 +1,6 @@
 # Lab 2 — Build an MCP server
 
-**Time:** ~20 minutes
+**Time:** ~20 minutes | **Required workspace:** `workshop/lab1_lab2/`
 
 ---
 
@@ -31,12 +31,6 @@ Lab 2 starts where Lab 1 left off. The `flyTo` Cesium tool is working, so the ag
 
 By the end, prompts like **"Find attractions in Barcelona and fly to the first one"** should trigger both MCP and Cesium tools in one turn.
 
-> [!NOTE]
->
-> **Two kinds of steps in this lab.** Watch for these badges on each step:
-> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
-> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
-
 ### What's already implemented
 
 | Feature | Status | Source code |
@@ -63,8 +57,12 @@ Lab 2 continues in the same workspace as Lab 1: `workshop/lab1_lab2`. See [Lab 1
 
 ```bash
 cd workshop/lab1_lab2
-pnpm dev # -> http://localhost:3000
+pnpm dev # → http://localhost:3000
 ```
+
+> [!TIP]
+>
+> **Already have the app running from Lab 1?** You can skip the `pnpm dev` step — the app is still running on port 3000. If you hit a port conflict on any port, run `npx kill-port 3000 3001 3002` to free them all, then restart.
 
 > [!IMPORTANT]
 >
@@ -81,20 +79,19 @@ pnpm dev # -> http://localhost:3000
 
 ---
 
+> [!NOTE]
+>
+> **Two kinds of steps in this lab.** Watch for these badges on each step:
+> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
+> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
+
 ## Section 2 — Create the MCP server
 
 You will build a standalone MCP server package that queries OpenStreetMap Overpass for points of interest in order to supercharge the LLM agent's ability to precisely locate places and move the camera accordingly.
 
-### Step 1 - Install the MCP package dependencies
+The `packages/mcp-poi/` directory is already scaffolded with `package.json`, `tsconfig.json`, and all source files pre-populated — and its dependencies were installed when you ran `pnpm install` in Section 1.
 
-The `packages/mcp-poi/` directory is already scaffolded with `package.json`, `tsconfig.json`, and all source files pre-populated. From the lab root, install dependencies (this also installs the `mcp-poi` workspace package):
-
-```bash
-cd workshop/lab1_lab2
-pnpm install
-```
-
-### Step 2 - Review the Overpass API client
+### Step 1 - Review the Overpass API client
 
 > 📖 **Review only** — read and understand this file. No edits needed.
 
@@ -137,9 +134,9 @@ export async function searchPois(
 }
 ```
 
-No edits are needed here. Continue to Step 3.
+No edits are needed here. Continue to Step 2.
 
-### Step 3 - Review the server entry point
+### Step 2 - Review the server entry point
 
 > 📖 **Review only** — read and understand this file. No edits needed.
 
@@ -182,9 +179,9 @@ app.listen(PORT, () => {
 });
 ```
 
-No edits are needed here. Continue to Step 4.
+No edits are needed here. Continue to Step 3.
 
-### Step 4 - Register the MCP tool
+### Step 3 - Register the MCP tool
 
 > ✏️ **You implement** — you uncomment the tool definition in this step.
 
@@ -192,7 +189,7 @@ Here we are defining the first tool on this MCP server. The syntax is slightly d
 
 Open the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts). The file has a skeleton and a commented-out implementation.
 
-**Uncomment the `registerPoiTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
+The implementation is pre-written but commented out so you can read through each piece before making it active. **Uncomment the `registerPoiTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
 
 > [!TIP]
 >
@@ -245,7 +242,7 @@ export function registerPoiTools(server: McpServer) {
 }
 ```
 
-### Step 5 - Start the MCP server
+### Step 4 - Start the MCP server
 
 Open a new terminal window. Switch to the `mcp-poi` package directory and start the MCP server using the following commands:
 
@@ -267,18 +264,6 @@ By default the MCP server should be running on port 3001. Check the terminal to 
 > ✏️ **You implement** — you edit `mcp-servers.config.ts` in this section.
 
 Open [src/lib/mcp-servers.config.ts](lab1_lab2/src/lib/mcp-servers.config.ts#L9) and update `MCP_SERVERS`:
-
-```diff
-export const MCP_SERVERS: McpServerConfig[] = [
-  // Add your MCP server here after building it in the lab exercise.
-+   {
-+     label: "POI",
-+     transport: { type: "http", url: "http://localhost:3001/mcp" },
-+   },
-];
-```
-
-**Copy-paste version:**
 
 ```typescript
 export const MCP_SERVERS: McpServerConfig[] = [
@@ -311,6 +296,10 @@ Let's switch contexts back to the application. Now we will add the scaffolding n
 
 Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx). The inline `👇 LAB 2` anchor markers show exactly where each change goes.
 
+> [!TIP]
+>
+> If you prefer to see the full picture first or get stuck at any point, jump to the [**Completed state**](#completed-state) at the bottom of this section.
+
 ### Step 1 - Add imports
 
 Replace the `👇 LAB 2 — STEP 1` import marker with:
@@ -339,65 +328,19 @@ const registry = useMemo(() => {
 
 ### Step 4 - Pass merged tools to `useAIChat`
 
-```diff
-const { messages, status, error, sendMessage, abort, retry } = useAIChat({
--  tools,
-+  tools: registry.getAll(),
-+  // Required by the app to display tool origin metadata in the UI.
-+  toolOrigins: registry.getOrigins(),
-});
-```
-
-**Copy-paste version:**
+Replace the existing `useAIChat` call with:
 
 ```typescript
+// tools and toolOrigins are now sourced from the merged registry.
 const { messages, status, error, sendMessage, abort, retry } = useAIChat({
   tools: registry.getAll(),
-  // Required by the app to display tool origin metadata in the UI.
   toolOrigins: registry.getOrigins(),
 });
 ```
 
 ### Completed state
 
-After all four steps, the top of `ChatPanel.tsx` should look like this:
-
-```diff
-  "use client";
-
-  import { useMemo } from "react";
-  import { AlertCircle, RefreshCw, WifiOff } from "lucide-react";
-  import { useAIChat } from "@/hooks/useAIChat";
-  import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-  import { useCesiumViewer } from "@/hooks/useCesiumViewer";
-  import { createCameraTools } from "@/lib/ai/tools/cesium/camera-tools";
-+ import { useMcpServers } from "@/hooks/useMcpServers";
-+ import { MCP_SERVERS } from "@/lib/mcp-servers.config";
-+ import { ToolRegistry } from "@/lib/ai/tools";
-  import { Button } from "@/components/ui/button";
-  import { ChatMessages } from "./ChatMessages";
-  import { ChatInput } from "./ChatInput";
-
-  export function ChatPanel() {
-    const { viewerRef } = useCesiumViewer();
-    const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
-
-+   const { mcpTools } = useMcpServers({ servers: MCP_SERVERS });
-+
-+   const registry = useMemo(() => {
-+     return new ToolRegistry().registerMcp(mcpTools).registerCesium(tools);
-+   }, [tools, mcpTools]);
-
-    const { messages, status, error, sendMessage, abort, retry } = useAIChat({
--     tools,
-+     tools: registry.getAll(),
-+     toolOrigins: registry.getOrigins(),
-    });
-
-    // ... rest of the component is unchanged
-```
-
-**Copy-paste version** — the final top of `ChatPanel.tsx`:
+After all four steps, the top of `ChatPanel.tsx` should look like this — the lines marked with `// ← add this` are the ones you added:
 
 ```typescript
 "use client";
@@ -408,9 +351,9 @@ import { useAIChat } from "@/hooks/useAIChat";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useCesiumViewer } from "@/hooks/useCesiumViewer";
 import { createCameraTools } from "@/lib/ai/tools/cesium/camera-tools";
-import { useMcpServers } from "@/hooks/useMcpServers";
-import { MCP_SERVERS } from "@/lib/mcp-servers.config";
-import { ToolRegistry } from "@/lib/ai/tools";
+import { useMcpServers } from "@/hooks/useMcpServers";        // ← add this
+import { MCP_SERVERS } from "@/lib/mcp-servers.config";       // ← add this
+import { ToolRegistry } from "@/lib/ai/tools";                // ← add this
 import { Button } from "@/components/ui/button";
 import { ChatMessages } from "./ChatMessages";
 import { ChatInput } from "./ChatInput";
@@ -419,15 +362,15 @@ export function ChatPanel() {
   const { viewerRef } = useCesiumViewer();
   const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
 
-  const { mcpTools } = useMcpServers({ servers: MCP_SERVERS });
+  const { mcpTools } = useMcpServers({ servers: MCP_SERVERS });  // ← add this
 
-  const registry = useMemo(() => {
+  const registry = useMemo(() => {                               // ← add this
     return new ToolRegistry().registerMcp(mcpTools).registerCesium(tools);
   }, [tools, mcpTools]);
 
   const { messages, status, error, sendMessage, abort, retry } = useAIChat({
-    tools: registry.getAll(),
-    toolOrigins: registry.getOrigins(),
+    tools: registry.getAll(),       // ← updated
+    toolOrigins: registry.getOrigins(), // ← add this
   });
 
   // ... rest of the component is unchanged
@@ -697,28 +640,13 @@ You should see: `Earthquake MCP server running on http://localhost:3002/mcp`
 
 Open [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) and add the earthquake server below the POI entry:
 
-```diff
-export const MCP_SERVERS: McpServerConfig[] = [
-    {
-      label: "POI",
-      transport: { type: "http", url: "http://localhost:3001/mcp" },
-    },
-+   {
-+     label: "Earthquake",
-+     transport: { type: "http", url: "http://localhost:3002/mcp" },
-+   },
-];
-```
-
-**Copy-paste version:**
-
 ```typescript
 export const MCP_SERVERS: McpServerConfig[] = [
   {
     label: "POI",
     transport: { type: "http", url: "http://localhost:3001/mcp" },
   },
-  {
+  { // ← add this
     label: "Earthquake",
     transport: { type: "http", url: "http://localhost:3002/mcp" },
   },

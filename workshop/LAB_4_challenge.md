@@ -1,6 +1,6 @@
 # Lab 4 — Free exploration with public datasets
 
-**Time:** ~20 minutes
+**Time:** ~20 minutes | **Required workspace:** `workshop/lab3_lab4/` _(same workspace as Lab 3)_
 
 ---
 
@@ -20,6 +20,7 @@ Lab 4 is open-ended. By now, your app has Cesium tools, MCP support, and prompt 
 - Build or extend at least one MCP server.
 - Chain multiple tools and data sources in one conversational flow.
 - Visualize your results on the Cesium globe.
+
 
 Some experiments might lead to a polished demo, others to an unexpected result or a funny failure — both are worth exploring. Here are some ideas to spark your imagination:
 - earthquakes + nearby hospitals,
@@ -62,7 +63,7 @@ cd workshop/lab3_lab4
 pnpm install
 ```
 
-Create `.env` (same format as previous labs) if needed.
+Copy `.env.example` to `.env` if you haven't already — this is required to start the app (same values as Lab 3).
 
 ### Start all processes
 
@@ -131,7 +132,7 @@ If those work, your baseline is ready for custom experiments.
 
 Not sure where to begin? Here are a few directions — browse, mix, or ignore them and bring your own idea.
 
-- **Add a new data source** — pick any public API, wrap it in a focused MCP server, and expose 1–3 tools. Browse available no-auth APIs in [data-sources.md](data-sources.md#all-available-sources). Reference implementations for all 26 sources are in [`workshop/lab4_mcps/`](lab4_mcps/) — copy one as a starting point rather than writing from scratch.
+- **Add a new data source** — pick any public API, wrap it in a focused MCP server, and expose 1–3 tools. Browse available no-auth APIs in [data-sources.md](data-sources.md#all-available-sources). Reference implementations for all 26 sources are in [`workshop/lab4_mcps/`](lab4_mcps/) (S02–S26) and `lab3_lab4/packages/mcp-weather/` (S01 — Open-Meteo, already pre-wired) — copy one as a starting point rather than writing from scratch.
 - **Combine two or more sources** — chain data sources to generate an insight neither could produce alone. See ready-made patterns in [data-sources.md](data-sources.md#ready-made-combinations) (flood readiness, earthquake exposure, natural event context cards, service accessibility, and more).
 - **Visualization-first** — already have data? Focus on geospatial storytelling: time-lapse with `setTime` + `clockControl`, layered overlays, or route/marker narratives across multiple cities.
 

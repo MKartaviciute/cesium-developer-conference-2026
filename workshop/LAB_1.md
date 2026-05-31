@@ -1,6 +1,6 @@
 # Lab 1 — Our first Cesium tool
 
-**Time:** ~15 minutes
+**Time:** ~15 minutes | **Required workspace:** `workshop/lab1_lab2/`
 
 ---
 
@@ -19,12 +19,6 @@ We are starting with the 3D globe and chat already built and running. The agent 
 - Wire the tool into the chat agent.
 
 By the end, the prompt **"Fly to Paris"** will animate the globe camera.
-
-> [!NOTE]
->
-> **Two kinds of steps in this lab.** Throughout these labs, watch for these badges on each section:
-> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
-> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
 
 ![Completed Lab 1: typing "Fly to Paris" in the chat animates the globe camera to Paris](images/lab1_complete.gif)
 
@@ -66,15 +60,15 @@ copy .env.example .env  # Windows
 >
 > No terminal needed: in the VS Code file explorer, right-click `.env.example` → **Copy**, then right-click → **Paste**, and rename the copy to `.env`.
 
-Then open `.env` and fill in your API key (provided during the workshop):
+Then open `.env` and fill in your API key (your workshop organizer will provide the key, base URL, and model name):
 
 ```env
 # Optional — some imagery/terrain features require a Cesium Ion token
 CESIUM_ION_ACCESS_TOKEN=your_token_here
 
-OPENAI_API_KEY=
-AI_BASE_URL=
-AI_MODEL=gpt-5.4
+OPENAI_API_KEY=your_key_here
+AI_BASE_URL=your_base_url_here
+AI_MODEL=your_model_name_here
 ```
 
 Now run the app and open a new browser tab to http://localhost:3000:
@@ -95,6 +89,12 @@ pnpm dev # → http://localhost:3000
 - [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (wire tools into chat)
 
 ---
+
+> [!NOTE]
+>
+> **Two kinds of steps in this lab.** Throughout these labs, watch for these badges on each section:
+> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
+> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
 
 ## Section 2 — Verify the baseline functionality
 
@@ -179,7 +179,7 @@ You will replace that stub by creating a new tool file and importing it.
 
 This file is the container for all tools we want to implement related to camera control. It is pre-populated with a skeleton and a commented-out implementation.
 
-**Uncomment the `createCameraTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
+The implementation is pre-written but commented out so you can read through each piece before making it active. **Uncomment the `createCameraTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
 
 > [!TIP]
 >
@@ -253,7 +253,10 @@ Completely remove the local `createCameraTools` stub function and add the follow
 - }
 ```
 
-**Copy-paste version** — to avoid mistakes when deleting the stub, you can replace the **entire contents** of `cesium/index.ts` with the following. The only change from the starter file is the first line (the import replaces the stub function):
+<details>
+<summary>Full file — copy-paste to avoid stub deletion mistakes</summary>
+
+Replace the **entire contents** of `cesium/index.ts` with the following (the only change from the starter file is the first line — the import replaces the stub function):
 
 ```typescript
 "use client";
@@ -297,6 +300,8 @@ export function createCesiumTools(viewerRef: RefObject<Viewer | null>): Record<s
 }
 ```
 
+</details>
+
 ---
 
 ## Section 5 — Connect the tool to the LLM
@@ -317,29 +322,14 @@ import { createCameraTools } from "@/lib/ai/tools/cesium/camera-tools";
 
 ### Step 2 — Replace `tools: {}`
 
-```diff
-export function ChatPanel() {
--   // No tools wired yet — the assistant can only answer with text.
-+   // Add required scaffolding to make tools available to the chat component.
-+   const { viewerRef } = useCesiumViewer();
-+   const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
-  const { messages, status, error, sendMessage, abort, retry } = useAIChat({
--     tools: {},
-+     tools,
-  });
-  const { isOnline } = useNetworkStatus();
-});
-```
-
-**Copy-paste version** — after the edit, the start of `ChatPanel` should read:
+Replace the `👇 LAB 1 — STEP 2` marker. The start of `ChatPanel` should read:
 
 ```typescript
 export function ChatPanel() {
-  // Add required scaffolding to make tools available to the chat component.
-  const { viewerRef } = useCesiumViewer();
-  const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
+  const { viewerRef } = useCesiumViewer(); // add
+  const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]); // add
   const { messages, status, error, sendMessage, abort, retry } = useAIChat({
-    tools,
+    tools, // replace tools: {}
   });
   const { isOnline } = useNetworkStatus();
 ```
