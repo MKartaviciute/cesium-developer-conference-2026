@@ -51,7 +51,7 @@ The app currently looks like the end of Lab 1: `flyTo` works, but no external MC
 
 > [!TIP]
 >
-> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: Start everything (app + POI server)"** to start the app and the MCP server together.
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: Start everything (app + POI server)"** to start the app and the MCP server together. The POI server starts before you uncomment the tool, but `pnpm dev` uses `tsx watch` — it auto-reloads as soon as you save your changes in Section 2.
 
 Lab 2 continues in the same workspace as Lab 1: `workshop/lab1_lab2`. See [Lab 1 setup](LAB_1.md#section-1--setup-start-here) if you are behind. If you closed the terminal from Lab 1, open a new terminal and start the app server again.
 
@@ -244,6 +244,10 @@ export function registerPoiTools(server: McpServer) {
 
 ### Step 4 - Start the MCP server
 
+> [!TIP]
+>
+> **Already running the VS Code "Start everything" task from Section 1?** The POI server is already running — `pnpm dev` uses `tsx watch`, so it auto-reloads whenever you save a file. Your tool is now live. Skip the commands below and go straight to [Section 3](#section-3--register-the-server-in-the-app).
+
 Open a new terminal window. Switch to the `mcp-poi` package directory and start the MCP server using the following commands:
 
 ```bash
@@ -253,7 +257,7 @@ pnpm dev
 
 > [!TIP]
 >
-> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 2: POI MCP server (port 3001)"** to start the MCP server. (To start the app and the POI server together in one step, run the **"Lab 1 & 2: Start everything (app + POI server)"** task instead.)
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 2: POI MCP server (port 3001)"** to start the MCP server.
 
 By default the MCP server should be running on port 3001. Check the terminal to confirm the exact port that is being used.
 

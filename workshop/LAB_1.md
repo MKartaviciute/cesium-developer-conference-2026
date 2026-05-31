@@ -83,10 +83,12 @@ pnpm dev # → http://localhost:3000
 
 **Files you will modify in this lab:**
 - [`.env`](lab1_lab2/.env) - add (copy from `.env.example`)
-- [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - pre-populated (no edits needed)
 - [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) - uncomment (pre-populated)
 - the Cesium tools **barrel** file [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts) - edit (replace stub with import)
 - [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (wire tools into chat)
+
+**Files you will read but not edit:**
+- [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - review only (pre-populated)
 
 ---
 

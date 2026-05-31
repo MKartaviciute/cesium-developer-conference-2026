@@ -80,6 +80,17 @@ pnpm install
 
 Copy [`.env.example`](lab3_lab4/.env.example) to [`.env`](lab3_lab4/.env) (or reuse the values from Lab 1):
 
+```bash
+copy .env.example .env  # Windows
+# cp .env.example .env  # macOS/Linux
+```
+
+> [!TIP]
+>
+> No terminal needed: in the VS Code file explorer, right-click `.env.example` → **Copy**, then right-click → **Paste**, and rename the copy to `.env`.
+
+Then fill in your API key values:
+
 ```env
 OPENAI_API_KEY=your_key_here
 AI_BASE_URL=your_base_url_here
@@ -464,7 +475,7 @@ or narrative descriptions. You have direct control of a CesiumJS 3D globe viewer
 
 Run the same two prompts. The open-ended question ("Paris or Rome?") is where the contrast is sharpest — a single factual sentence instead of a travel pitch.
 
-#### Restore for the next section
+#### Restore before moving on
 
 Put back the original `ROLE` before continuing:
 
