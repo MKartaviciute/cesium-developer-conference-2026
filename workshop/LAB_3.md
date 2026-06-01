@@ -362,7 +362,7 @@ Save, reload, and run the same prompt again.
 
 ## Section 5 — A completed example
 
-After some trial and error, your `system-prompt.ts` may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
+After some trial and error, your [`system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
 
 ```typescript
 // Global rules that apply across all tools.
@@ -417,7 +417,7 @@ System prompts do two things in agentic applications:
 1. **Orchestrate actions** — tell the model which tools to call, in what order, and when to stop.
 2. **Shape output** — enforce consistent label formats, colors, summary structure, and response style.
 
-On a weaker model, (1) is the challenge: the model will stop after retrieving data instead of acting on it. On a stronger model like `gpt-5.4`, (1) often works without help — but (2) still requires explicit rules. A model that completes a task correctly but formats the output differently on each run is unreliable in production. This bonus exercises both.
+On a weaker language model, (1) can be challenging. The model will stop after retrieving data instead of acting on it. On a stronger model like `gpt-5.4`, (1) often works without help, but (2) still requires explicit rules. A model that completes a task correctly but formats the output differently on each run is unreliable in production. This bonus exercises both.
 
 ---
 
@@ -430,6 +430,8 @@ Reload the browser (`F5`) and type:
 Note exactly: the label text on each marker, the colors chosen, whether a polyline was drawn, and the format of the summary. Then reload and run the exact same prompt again.
 
 The tool calls will be the same both times — but the styling details will likely vary:
+
+![Looping animation of the LLM making slightly different styling and selection choices with the same prompt across a handfull of trials.](images/lab3_bonus_default_behavior.gif)
 
 | What the model decides freely | Why it matters in a real app |
 |---|---|
@@ -463,9 +465,11 @@ Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system
 
 Save, reload, and run the Paris tour prompt again. Labels, colors, polyline style, and summary format should now match the rules exactly. Run it a second time — the output structure is identical.
 
+![Screenshot of the LLM executing the same instruction as the previous clip, but this time with strict formatting rules.](images/lab3_bonus_with_formatting_rules.png)
+
 > [!TIP]
 >
-> On stronger models these rules typically apply even to single-item requests (a coffee shop, a one-off pin) without extra instruction. If you find the rules aren't being applied consistently for non-tour requests, add explicit unconditional trigger coverage: `"For any addEntity call — including single pins and one-off markers — always use the '[N] Name (Category)' label format. There are no exceptions based on request type."`
+> On stronger language models these rules typically apply even to single-item requests (a coffee shop, a one-off pin) without extra instruction. If you find the rules aren't being applied consistently for non-tour requests, add explicit unconditional trigger coverage: `"For any addEntity call — including single pins and one-off markers — always use the '[N] Name (Category)' label format. There are no exceptions based on request type."`
 
 ---
 
