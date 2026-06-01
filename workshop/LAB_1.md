@@ -8,17 +8,17 @@
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
-Right now the AI is like a GPS that can describe directions but cannot actually steer the car. The moment you give it a *tool* — a function it is allowed to call — it stops being a text generator and starts being an agent that acts on the world. This lab adds the very first tool: the ability to move the camera. One tool is all it takes to cross that line.
+In this lab we will learn about tool calling. This is one of the simplest ways to give an LLM some control over its environment. The moment you give it a *tool* — a function it is allowed to call — it stops being a text generator and starts being an agent that acts on the world. This lab adds the very first tool: the ability to move the camera. One tool is all it takes to cross that line.
 
 ---
 
 ## Section 2 — Goal
 
-In this lab we are starting with the 3D globe and chat already built and running. However, there is no meaningful connection between the chat agent and the globe. The agent can answer questions, but it cannot control the globe.
+In this lab we are starting with the 3D globe and chat already built and running. However, there is no meaningful connection between the chat agent and the globe built yet. The agent can answer questions, but it cannot control the globe.
 
 In this lab you will:
 
-- Create a camera helper that wraps the core CesiumJS function call.
+- Create a camera helper that wraps a core CesiumJS function call.
 - Define a `flyTo` AI tool that calls that helper.
 - Wire the tool into the chat agent.
 
@@ -284,7 +284,7 @@ Congrats! The globe now moves because the LLM agent can call the `flyTo` tool an
 > - "Take me to Mount Fuji"
 > - "Show me the Sahara Desert"
 > - "Go to Sydney Harbour"
-> - "Go to that place where Nicholas Cage finds the special spectacles in National Treasure." 
+> - "Go to the place in the movie National Treasure where the clue hidden in the cipher on the back of the Declaration of Independence leads to next." 
 >
 > Observe how the LLM resolves natural-language place names into coordinates.
 
@@ -346,10 +346,10 @@ The globe should animate back to its default position every time — even though
 
 > [!TIP]
 >
-> **Teaching moment:** The LLM doesn't need coordinates or numbers to decide which tool to call. A well-written `description` is enough. This is a powerful design principle — keep tool selection logic in the description, not the schema.
+> The LLM doesn't need coordinates or numbers to decide which tool to call. A well-written `description` is enough. This is a powerful design principle — keep tool selection logic in the description, not the schema.
 
 ---
 
 ## Section 11 — What's next
 
-In [**Lab 2**](LAB_2.md), you will build an external MCP server and connect it so the AI can call your custom tools alongside Cesium tools.
+In [**Lab 2**](LAB_2.md), you will build an MCP server and connect it so the AI can call your exernal tools alongside the application's Ceisum tools.
