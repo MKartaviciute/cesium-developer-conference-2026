@@ -262,22 +262,22 @@ Agent:
 
 ---
 
-<summary><strong>After the workshop</strong></summary>
+## After the workshop
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
-**Share what you built** — we'd love to see it:
+### Share what you built
 
 Share your experiment however you like — a screenshot, short video, or a prompt that made you laugh. The only guidelines are:
 
 - Use the hashtag **#CesiumDevCon** on [X](https://x.com/search?q=%23CesiumDevCon) or [LinkedIn](https://www.linkedin.com/feed/hashtag/cesiumdevcon/) so your post is easy to find.
 - Tag [**@CesiumJS**](https://x.com/CesiumJS) on X or the [**Cesium LinkedIn page**](https://www.linkedin.com/company/cesium-gs/) (@Cesium) so the team can see and reshare your work.
 
-**Keep building:**
+### Keep building
 
 - Swap in your own domain data as an MCP server (earthquakes, flights, weather stations, IoT sensors, …).
 - Add multi-step planning: ask the agent to _"plan a route between 5 cities"_ before executing.
 
-**Questions?**
+### Questions?
 
 Ask in the [Cesium Community Forum](https://community.cesium.com).
