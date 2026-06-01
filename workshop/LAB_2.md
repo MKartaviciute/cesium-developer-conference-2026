@@ -57,8 +57,20 @@ Lab 2 continues in the same workspace as Lab 1: `workshop/lab1_lab2`. See [Lab 1
 
 ```bash
 cd workshop/lab1_lab2
-pnpm dev # → http://localhost:3000
+pnpm dev
 ```
+
+Once ready, the terminal will show something like:
+
+```
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.237:3000
+- Environments: .env
+✓ Ready in 2.9s
+```
+
+Open a browser and navigate to **http://localhost:3000**.
 
 > [!TIP]
 >
@@ -282,7 +294,7 @@ export const MCP_SERVERS: McpServerConfig[] = [
 >
 > Make sure the port in the `url` matches the port printed in your terminal in the previous step.
 
-After saving, check the running application in your browser. The MCP status panel should show the POI server as connected with its tool listed.
+After saving, **refresh the app in your browser** to pick up the new MCP server config, then check the MCP status panel — it should show the POI server as connected with its tool listed.
 
 ![The MCP panel showing the POI server connected and the get_points_of_interest tool available.](images/lab2_poi_mcp_connected.gif)
 
@@ -659,7 +671,7 @@ export const MCP_SERVERS: McpServerConfig[] = [
 
 ### Step 7 — Test the chain
 
-Save and try this prompt:
+Save, then **refresh the app in your browser** to pick up the new server, and try this prompt:
 
 > **"Find the strongest earthquake this week and fly to it"**
 

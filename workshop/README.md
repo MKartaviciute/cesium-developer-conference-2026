@@ -85,7 +85,7 @@ CESIUM_ION_ACCESS_TOKEN=    # optional
 ---
 
 <details>
-<summary><strong>Running the apps</strong></summary>
+<summary><strong>Running the apps</strong> (click to expand)</summary>
 
 Each lab needs the Next.js app running, plus one or more MCP servers. You have two ways to start everything.
 
@@ -132,7 +132,7 @@ Open http://localhost:3000 once everything is running. The status bar turns gree
 ---
 
 <details>
-<summary><strong>Workspace structure</strong></summary>
+<summary><strong>Workspace structure</strong> (click to expand)</summary>
 
 Labs 1–2 and Labs 3–4 each have their own starter app located in the folders `lab1_lab2` and `lab3_lab4`. Both starter apps are structurally the same. Labs 3–4 simply have more tools and an extra MCP server pre-wired.
 
@@ -211,7 +211,7 @@ lab3_lab4/
 ---
 
 <details>
-<summary><strong>Architecture overview</strong></summary>
+<summary><strong>Architecture overview</strong> (click to expand)</summary>
 
 ### What is an AI agent?
 
