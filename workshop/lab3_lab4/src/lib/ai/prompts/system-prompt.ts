@@ -19,10 +19,17 @@ You can add entities, layers, and tilesets to the globe, control the camera, man
 // Tool guidance
 // ---------------------------------------------------------------------------
 
-// TODO (Lab 3 — Section 4): Add a TOOL_GUIDANCE block here with global rules
-// that apply across all tools, then include it in buildSystemPrompt() below:
+// TODO (Lab 3 — Section 4, Step 1): Add the TOOL_GUIDANCE constant here:
+//
+// const TOOL_GUIDANCE = `
+// ## Tool usage
+//
+// - When a search or POI tool returns results with coordinates, call flyTo to navigate
+//   to the search area, then call addEntity for each result to place a red marker with the place name as a label on the globe.
+// `;
+//
+// TODO (Lab 3 — Section 4, Step 2): Update buildSystemPrompt() below to:
 //   return [ROLE, TOOL_GUIDANCE].join("\n\n");
-// See LAB_3.md Section 4 for the exact content to add.
 
 // ---------------------------------------------------------------------------
 // Assembled system prompt

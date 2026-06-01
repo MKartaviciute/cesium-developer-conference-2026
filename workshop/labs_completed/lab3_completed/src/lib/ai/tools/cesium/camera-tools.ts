@@ -32,17 +32,20 @@ import {
   type ZoomToOutput,
 } from "./schemas/camera";
 
-export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
-  return {
-    flyTo: tool({
-     description:
+// ✏️  Lab 3, Section 3 — Part B: edit this tool description (the text the model reads to decide when and how to call this tool)
+const FLY_TO_DESCRIPTION =
   "Fly the camera smoothly to a geographic location on the globe. " +
   "Use for pure navigation requests: 'go to', 'fly to', 'zoom in', " +
   "'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. " +
   "Do NOT use for queries about places ('show me restaurants', " +
   "'find museums near', 'what's around') — those should go to a " +
   "search/POI tool instead. Does NOT add a marker — use addEntity " +
-  "separately if a pin is needed.",
+  "separately if a pin is needed.";
+
+export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
+  return {
+    flyTo: tool({
+      description: FLY_TO_DESCRIPTION,
       inputSchema: flyToSchema,
       execute: async (params): Promise<FlyToOutput> => {
         const viewer = viewerRef.current;
@@ -64,7 +67,9 @@ export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
 
     cameraLookAt: tool({
       description:
-        "Lock the camera to look at ('focus on', 'point at', 'target', 'centre on') a specific geographic point from a given range and pitch. The camera is fixed in a spherical offset relative to the target, enabling orbiting. REQUIRED before calling cameraStartOrbit — always call cameraLookAt first to set the orbit centre.",
+        "Lock the camera to look at ('focus on', 'point at', 'target', 'centre on') a specific geographic point from a given range and pitch. " +
+        "The camera is fixed in a spherical offset relative to the target, enabling orbiting. " +
+        "REQUIRED before calling cameraStartOrbit — always call cameraLookAt first to set the orbit centre.",
       inputSchema: cameraLookAtSchema,
       execute: async (params): Promise<CameraLookAtOutput> => {
         const viewer = viewerRef.current;
@@ -85,7 +90,10 @@ export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
     }),
 
     cameraStopOrbit: tool({
-      description: "Stop the active camera orbit. Use for 'stop orbiting', 'stop rotating', 'stop spinning', 'stop the orbit', 'cancel the orbit', or any request to end the continuous camera rotation started by cameraStartOrbit.",
+      description:
+        "Stop the active camera orbit. " +
+        "Use for 'stop orbiting', 'stop rotating', 'stop spinning', 'stop the orbit', 'cancel the orbit', " +
+        "or any request to end the continuous camera rotation started by cameraStartOrbit.",
       inputSchema: cameraStopOrbitSchema,
       execute: async (): Promise<CameraStopOrbitOutput> => {
         const viewer = viewerRef.current;
@@ -114,7 +122,10 @@ export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
 
     cameraSetControllerOptions: tool({
       description:
-        "Configure camera movement constraints and behaviour. Use for 'lock the camera', 'freeze the view', 'disable zoom', 'prevent tilting', 'disable rotation', 'lock camera movement'. To lock: set the relevant enable flags to false. To unlock: set them back to true. Can also set minimum/maximum zoom distances to restrict how close or far the user can zoom.",
+        "Configure camera movement constraints and behaviour. " +
+        "Use for 'lock the camera', 'freeze the view', 'disable zoom', 'prevent tilting', 'disable rotation', 'lock camera movement'. " +
+        "To lock: set the relevant enable flags to false. To unlock: set them back to true. " +
+        "Can also set minimum/maximum zoom distances to restrict how close or far the user can zoom.",
       inputSchema: cameraSetControllerOptionsSchema,
       execute: async (params): Promise<CameraSetControllerOptionsOutput> => {
         const viewer = viewerRef.current;
@@ -125,7 +136,9 @@ export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
 
     zoomTo: tool({
       description:
-        "Zoom the camera to frame a named entity using its bounding sphere with extra standoff so the entity is not too close. Use this after addEntity, addBox, addCylinder, addPolygon, addPolyline, addRectangle, addEllipse, addCorridor, or addWall to show the newly added object. Optional zoomOutFactor and minRange can be used to frame more context.",
+        "Zoom the camera to frame a named entity using its bounding sphere with extra standoff so the entity is not too close. " +
+        "Use this after addEntity, addBox, addCylinder, addPolygon, addPolyline, addRectangle, addEllipse, addCorridor, or addWall to show the newly added object. " +
+        "Optional zoomOutFactor and minRange can be used to frame more context.",
       inputSchema: zoomToSchema,
       execute: async (params): Promise<ZoomToOutput> => {
         const viewer = viewerRef.current;

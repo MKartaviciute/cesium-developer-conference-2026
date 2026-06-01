@@ -44,11 +44,16 @@ import {
   type ListEntitiesOutput,
 } from "./schemas/entity";
 
+// ✏️  Lab 3, Section 3 — Part A: edit this tool description (the text the model reads to decide when and how to call this tool)
+const ADD_ENTITY_DESCRIPTION =
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. " +
+  "Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. " +
+  "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.";
+
 export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
   return {
     addEntity: tool({
-      description:
-        "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.",
+      description: ADD_ENTITY_DESCRIPTION,
       inputSchema: addEntitySchema,
       execute: async (params): Promise<AddEntityOutput> => {
         const viewer = viewerRef.current;
@@ -70,7 +75,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addPolygon: tool({
       description:
-        "Add a filled geographic polygon to the globe defined by an array of lat/lon vertices. Supports optional extrusion for a 3D effect. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new polygon.",
+        "Add a filled geographic polygon to the globe defined by an array of lat/lon vertices. " +
+        "Supports optional extrusion for a 3D effect. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new polygon.",
       inputSchema: addPolygonSchema,
       execute: async (params): Promise<AddPolygonOutput> => {
         const viewer = viewerRef.current;
@@ -81,7 +88,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addPolyline: tool({
       description:
-        "Add a polyline connecting multiple geographic positions to the globe. Useful for paths, routes, and connections. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new line.",
+        "Add a polyline connecting multiple geographic positions to the globe. " +
+        "Useful for paths, routes, and connections. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new line.",
       inputSchema: addPolylineSchema,
       execute: async (params): Promise<AddPolylineOutput> => {
         const viewer = viewerRef.current;
@@ -92,7 +101,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addRectangle: tool({
       description:
-        "Add an axis-aligned geographic rectangle defined by west/south/east/north boundaries. Supports optional extrusion for a 3D box effect. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new rectangle.",
+        "Add an axis-aligned geographic rectangle defined by west/south/east/north boundaries. " +
+        "Supports optional extrusion for a 3D box effect. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new rectangle.",
       inputSchema: addRectangleSchema,
       execute: async (params): Promise<AddRectangleOutput> => {
         const viewer = viewerRef.current;
@@ -103,7 +114,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addBox: tool({
       description:
-        "Add a 3D box entity at a geographic position. Useful for representing buildings, containers, or volumetric markers. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new box.",
+        "Add a 3D box entity at a geographic position. " +
+        "Useful for representing buildings, containers, or volumetric markers. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new box.",
       inputSchema: addBoxSchema,
       execute: async (params): Promise<AddBoxOutput> => {
         const viewer = viewerRef.current;
@@ -114,7 +127,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addCylinder: tool({
       description:
-        "Add a cylinder or cone entity at a geographic position. Set topRadius to 0 to create a cone. Useful for towers, coverage indicators, and vertical structures. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new cylinder.",
+        "Add a cylinder or cone entity at a geographic position. Set topRadius to 0 to create a cone. " +
+        "Useful for towers, coverage indicators, and vertical structures. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new cylinder.",
       inputSchema: addCylinderSchema,
       execute: async (params): Promise<AddCylinderOutput> => {
         const viewer = viewerRef.current;
@@ -125,7 +140,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addModel: tool({
       description:
-        "Add a 3D model (glTF or GLB format) at a geographic position. Provide a publicly accessible URL to the model file. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new model.",
+        "Add a 3D model (glTF or GLB format) at a geographic position. " +
+        "Provide a publicly accessible URL to the model file. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new model.",
       inputSchema: addModelSchema,
       execute: async (params): Promise<AddModelOutput> => {
         const viewer = viewerRef.current;
@@ -136,7 +153,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addCorridor: tool({
       description:
-        "Add a corridor (path with width) to the globe. Useful for roads, pipelines, routes, and any linear area with a specific width. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new corridor.",
+        "Add a corridor (path with width) to the globe. " +
+        "Useful for roads, pipelines, routes, and any linear area with a specific width. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new corridor.",
       inputSchema: addCorridorSchema,
       execute: async (params): Promise<AddCorridorOutput> => {
         const viewer = viewerRef.current;
@@ -147,7 +166,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addEllipse: tool({
       description:
-        "Add an ellipse (or circle when semiMajorAxis === semiMinorAxis) at a geographic position. Useful for zones, coverage areas, and circular regions of interest. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new ellipse.",
+        "Add an ellipse (or circle when semiMajorAxis === semiMinorAxis) at a geographic position. " +
+        "Useful for zones, coverage areas, and circular regions of interest. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new ellipse.",
       inputSchema: addEllipseSchema,
       execute: async (params): Promise<AddEllipseOutput> => {
         const viewer = viewerRef.current;
@@ -158,7 +179,9 @@ export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
 
     addWall: tool({
       description:
-        "Add a vertical wall or fence defined by a series of positions. Supports variable per-position heights. Useful for barriers, fences, and vertical structures. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new wall.",
+        "Add a vertical wall or fence defined by a series of positions. " +
+        "Supports variable per-position heights. Useful for barriers, fences, and vertical structures. " +
+        "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned centroidLatitude and centroidLongitude to show the user the new wall.",
       inputSchema: addWallSchema,
       execute: async (params): Promise<AddWallOutput> => {
         const viewer = viewerRef.current;

@@ -54,10 +54,6 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 >
 > We have provided a starter app for each lab. You will be adding the missing pieces. See 'Workspace structure' below for details.
 
-> [!TIP]
->
-> **Navigating lab files:** clicking a lab link above opens it in this preview pane. To open a lab side-by-side and keep your place here, **Ctrl+click** (Windows/Linux) or **Cmd+click** (macOS) the link — it opens in a new editor group.
-
 ---
 
 ## Environment setup

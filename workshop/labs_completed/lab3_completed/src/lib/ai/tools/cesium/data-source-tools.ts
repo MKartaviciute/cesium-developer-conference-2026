@@ -25,7 +25,10 @@ export function createDataSourceTools(viewerRef: RefObject<Viewer | null>) {
     }),
 
     removeLayer: tool({
-      description: "Remove a GeoJSON or data source layer from the globe by name. Use this only for layers added with addGeoJsonLayer — for point/shape entities use removeEntity, for 3D tilesets use removeTileset, for imagery use removeImageryLayer.",
+      description:
+        "Remove a GeoJSON or data source layer from the globe by name. " +
+        "Use this only for layers added with addGeoJsonLayer — " +
+        "for point/shape entities use removeEntity, for 3D tilesets use removeTileset, for imagery use removeImageryLayer.",
       inputSchema: removeLayerSchema,
       execute: async (params): Promise<RemoveLayerOutput> => {
         const viewer = viewerRef.current;

@@ -50,11 +50,16 @@ import {
   type ListEntitiesOutput,
 } from "./schemas/entity";
 
+// ✏️  Lab 3, Section 3 — Part A: edit this tool description (the text the model reads to decide when and how to call this tool)
+const ADD_ENTITY_DESCRIPTION =
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. " +
+  "Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. " +
+  "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.";
+
 export function createEntityTools(viewerRef: RefObject<Viewer | null>) {
   return {
     addEntity: tool({
-      description:
-        "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.",
+      description: ADD_ENTITY_DESCRIPTION,
       inputSchema: addEntitySchema,
       execute: async (params): Promise<AddEntityOutput> => {
         const viewer = viewerRef.current;
