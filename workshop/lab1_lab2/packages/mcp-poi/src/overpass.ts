@@ -10,6 +10,7 @@
 
 // Public Overpass endpoint used by this MCP server.
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const RETRYABLE_STATUSES = new Set([429, 503, 504]);
 
 // Final shape returned to the MCP tool.
 export interface PointOfInterest {
@@ -63,16 +64,22 @@ export async function searchPois(
     out center body;
   `;
 
-  // Execute the query via HTTP POST.
-  const res = await fetch(OVERPASS_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Accept": "application/json",
-      "User-Agent": "mcp-poi-server/1.0",
-    },
-    body: `data=${encodeURIComponent(query)}`,
-  });
+  // Execute the query via HTTP POST, retrying on transient errors.
+  // NOTE: On 429/503/504 responses the request is retried automatically (up to 3 attempts).
+  let res!: Response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+        "User-Agent": "mcp-poi-server/1.0",
+      },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+    if (res.ok || !RETRYABLE_STATUSES.has(res.status)) break;
+    if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * (attempt + 1) + Math.random() * 500));
+  }
 
   if (!res.ok) {
     // Bubble up provider errors with full body text for easier debugging.

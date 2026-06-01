@@ -4,6 +4,7 @@
  */
 
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const RETRYABLE_STATUSES = new Set([429, 503, 504]);
 
 export interface PointOfInterest {
   id: number;
@@ -55,15 +56,20 @@ export async function searchPois(
     out center body;
   `;
 
-  const res = await fetch(OVERPASS_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Accept": "application/json",
-      "User-Agent": "mcp-poi-server/1.0",
-    },
-    body: `data=${encodeURIComponent(query)}`,
-  });
+  let res!: Response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+        "User-Agent": "mcp-poi-server/1.0",
+      },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+    if (res.ok || !RETRYABLE_STATUSES.has(res.status)) break;
+    if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * (attempt + 1) + Math.random() * 500));
+  }
 
   if (!res.ok) {
     throw new Error(`Overpass API error ${res.status}: ${await res.text()}`);
