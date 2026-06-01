@@ -460,4 +460,4 @@ The globe should animate back to its default position every time — even though
 
 ## Section 8 — What's next
 
-In [**Lab 2**](LAB_2.md), you will build an MCP server and connect it so the AI can call your exernal tools alongside the application's Ceisum tools.
+In [**Lab 2**](LAB_2.md), you will build an MCP server and connect it so the AI can call your external tools alongside the application's Cesium tools.
