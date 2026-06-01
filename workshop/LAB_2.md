@@ -682,6 +682,8 @@ The agent should:
 
 The globe animates to the epicenter of the strongest recent earthquake — an MCP server and a Cesium tool chaining together in one conversational turn.
 
+![A looping screen capture of the globe animating to the epicenter of the strongest recent earthquake — an MCP server and a Cesium tool chaining together in one conversational turn.](images/lab2_bonus_earthquake_mcp_added.gif)
+
 > [!TIP]
 >
 > **More prompts to try:**
