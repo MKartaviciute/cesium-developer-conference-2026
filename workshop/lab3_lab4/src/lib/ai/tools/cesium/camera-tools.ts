@@ -38,11 +38,16 @@ import {
   type ZoomToOutput,
 } from "./schemas/camera";
 
+// ✏️  Lab 3, Section 3 — Part B: edit this tool description (the text the model reads to decide when and how to call this tool)
+const FLY_TO_DESCRIPTION =
+  "Fly the camera smoothly to a geographic location on the globe. " +
+  "Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. " +
+  "For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.";
+
 export function createCameraTools(viewerRef: RefObject<Viewer | null>) {
   return {
     flyTo: tool({
-      description:
-        "Fly the camera smoothly to a geographic location on the globe. Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.",
+      description: FLY_TO_DESCRIPTION,
       inputSchema: flyToSchema,
       execute: async (params): Promise<FlyToOutput> => {
         const viewer = viewerRef.current;

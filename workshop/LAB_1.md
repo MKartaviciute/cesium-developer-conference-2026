@@ -75,13 +75,13 @@ AI_MODEL=your_model_name_here
 >
 > Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
+### Step 3 — Start the app
+
 > [!TIP]
 >
 > **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: App (port 3000)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
 >
 > Lab 1 only needs the app — don't start the POI server yet (that's Lab 2).
-
-### Step 3 — Start the app
 
 ```bash
 pnpm dev
@@ -96,6 +96,8 @@ Once ready, the terminal will show something like:
 - Environments: .env
 ✓ Ready in 2.9s
 ```
+
+### Step 4 — Open the app
 
 Open a browser and navigate to **http://localhost:3000**.
 
@@ -128,7 +130,7 @@ In the chat panel, type:
 
 Notice the assistant responds with text, but the globe does not move.
 
-Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx) and find the `tools: {}` line (look for the `👇 LAB 1` markers). This empty object tells us that no tools are registered yet.
+Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx#L40) and find the `tools: {}` line (look for the `👇 LAB 1` markers). This empty object tells us that no tools are registered yet.
 
 Back in the app, look at the bottom left corner and find the status bar for MCP servers and tools. You can click on these to open a helpful debug panel describing what resources are currently connected to your LLM chat agent. Right now both lists should be empty.
 
@@ -199,7 +201,7 @@ function createCameraTools(_viewerRef: RefObject<Viewer | null>): Record<string,
 
 You will replace that stub by creating a new tool file and importing it.
 
-### Step 1 — Activate [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts)
+### Step 1 — Activate [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts#L24)
 
 This file is the container for all tools we want to implement related to camera control. It is pre-populated with a skeleton and a commented-out implementation.
 
@@ -208,6 +210,8 @@ The implementation is pre-written but commented out so you can read through each
 > [!TIP]
 >
 > **Fast way to uncomment in VS Code:** select every line of the commented block, then press `Ctrl+/` (`Cmd+/` on macOS) to toggle the comments off all at once. (Or simply replace the whole file's contents with the code block below.)
+>
+> **Made a mistake?** Press `Ctrl+Z` (`Cmd+Z` on macOS) to undo and restore the file to its previous state.
 
 ```typescript
 import { tool } from "ai";
@@ -261,7 +265,7 @@ export function createCameraTools(
 
 `createCameraTools` returns an object containing several `tools`. Take a moment to study the fields inside the `flyTo: Tool` object. Notice the natural language `description` of what the tool does. Notice the descriptions of each of the input parameters in `inputSchema` and the rules specifying what type the inputs have and whether or not they are optional. Keep this in mind as we will repeat this pattern soon to add more tools.
 
-### Step 2 — Update the Cesium tools barrel [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts)
+### Step 2 — Update the Cesium tools barrel [`src/lib/ai/tools/cesium/index.ts`](lab1_lab2/src/lib/ai/tools/cesium/index.ts#L11)
 
 Completely remove the local `createCameraTools` stub function and add the following import pointing to your real implementation in `camera-tools.ts`:
 
@@ -332,7 +336,7 @@ export function createCesiumTools(viewerRef: RefObject<Viewer | null>): Record<s
 
 > ✏️ **You implement** — you edit `ChatPanel.tsx` in this section.
 
-Open **[src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx)**. The file has inline `👇 LAB 1` anchor markers showing exactly where each change goes.
+Open **[src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx#L9)**. The file has inline `👇 LAB 1` anchor markers showing exactly where each change goes.
 
 ### Step 1 — Add imports at the top
 
@@ -404,11 +408,15 @@ The `description` field is what the LLM reads to decide **when** to call a tool.
 <details>
 <summary><strong>BONUS — Zero-parameter <code>resetCamera</code> tool</strong> (click to expand)</summary>
 
+> [!TIP]
+>
+> **Returning to this later?** Make sure the app is running first — see [Section 1 setup](#section-1--setup-start-here).
+
 A tool doesn't need parameters to be useful. Adding a **zero-parameter** `resetCamera` tool proves that the LLM's tool-selection is driven entirely by the `description` field — no input schema gymnastics required.
 
 ### Implementation
 
-Open [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) and add a `resetCamera` entry alongside the existing `flyTo` tool:
+Open [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts#L24) and add a `resetCamera` entry inside the `return { ... }` block, after the closing `},` of the `flyTo` tool:
 
 ```typescript
 resetCamera: tool({
@@ -430,7 +438,7 @@ resetCamera: tool({
 
 ### Test it
 
-Save and try these prompts:
+Save the file — the dev server picks up the change automatically. Try these prompts:
 
 > - **"Go back to the start"**
 > - **"Show me the whole Earth"**

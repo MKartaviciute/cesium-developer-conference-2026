@@ -78,6 +78,8 @@ Once ready, the terminal will show something like:
 ✓ Ready in 2.9s
 ```
 
+### Step 2 — Open the app
+
 Open a browser and navigate to **http://localhost:3000**.
 
 > [!IMPORTANT]
@@ -201,15 +203,17 @@ No edits are needed here. Continue to Step 3.
 
 > ✏️ **You implement** — you uncomment the tool definition in this step.
 
-Here we are defining the first tool on this MCP server. The syntax is slightly different from [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) in Lab 1, but the content should look familiar — a name, a description, input parameters with types, and an execute function.
+Here we are defining the first tool on this MCP server.
 
-Open the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts). The file has a skeleton and a commented-out implementation.
+Open the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts#L6). The file has a skeleton and a commented-out implementation. The syntax is slightly different from [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) in Lab 1, but the content should look familiar — a name, a description, input parameters with types, and an execute function.
 
 The implementation is pre-written but commented out so you can read through each piece before making it active. **Uncomment the `registerPoiTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
 
 > [!TIP]
 >
 > **Fast way to uncomment in VS Code:** select every line of the commented block, then press `Ctrl+/` (`Cmd+/` on macOS) to toggle the comments off all at once.
+>
+> **Made a mistake?** Press `Ctrl+Z` (`Cmd+Z` on macOS) to undo and restore the file to its previous state.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -460,6 +464,10 @@ Example prompts:
 <details>
 <summary><strong>BONUS — Build a USGS earthquake MCP server</strong> (click to expand)</summary>
 
+> [!TIP]
+>
+> **Returning to this later?** You need two servers running before starting here: the app (`pnpm dev` in `workshop/lab1_lab2`, port 3000) and the POI MCP server (`pnpm dev` in `workshop/lab1_lab2/packages/mcp-poi`, port 3001). See [Section 1 setup](#section-1--setup-start-here) if you need a reminder.
+
 You've built one MCP server (POI). Now build a **second** one that hits a completely different data source — [USGS Earthquake Feeds](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php). This drives home the pattern: any REST API can become an MCP tool in minutes. And because you already have `flyTo`, a prompt like **"Find the strongest earthquake this week and fly to it"** chains two MCP servers + Cesium in a single turn.
 
 ### Step 1 — Scaffold the package
@@ -652,9 +660,13 @@ pnpm dev
 
 You should see: `Earthquake MCP server running on http://localhost:3002/mcp`
 
+> [!TIP]
+>
+> If you see dependency resolution errors, run `pnpm install` once from the workspace root (`workshop/lab1_lab2`) first, then retry `pnpm dev` from `packages/mcp-earthquake`.
+
 ### Step 6 — Register in the app
 
-Open [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) and add the earthquake server below the POI entry:
+Open [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts#L11) and add the earthquake server below the POI entry:
 
 ```typescript
 export const MCP_SERVERS: McpServerConfig[] = [

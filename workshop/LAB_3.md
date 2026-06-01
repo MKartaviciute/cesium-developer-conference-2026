@@ -115,7 +115,6 @@ CESIUM_ION_ACCESS_TOKEN=
 This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
 
 ```bash
-cd workshop/lab3_lab4
 pnpm start:all
 ```
 
@@ -129,7 +128,13 @@ Once ready, the app terminal will show something like:
 ✓ Ready in 2.9s
 ```
 
+### Step 4 — Open the app
+
 Open a browser and navigate to **http://localhost:3000**.
+
+> [!NOTE]
+>
+> **Refresh the browser after every file save.** Next.js does not hot-reload tool descriptions or the system prompt — you must manually refresh (`F5` or `Ctrl+R`) to pick up your changes.
 
 <details>
 <summary>Prefer three separate terminals? (click to expand)</summary>
@@ -197,7 +202,7 @@ Tool descriptions influence both:
 
 ### Part A - Follow-up instructions
 
-Open [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) and locate the `addEntity` description. It includes this instruction:
+Open [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts#L53) and locate the `ADD_ENTITY_DESCRIPTION` constant at the top of the file — this is the text the model reads to decide when and how to call the tool. It includes this instruction:
 
 ```typescript
 "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker."
@@ -217,11 +222,11 @@ Expected behavior: `addEntity` runs, then `flyTo` runs to focus the new marker.
 
 #### Step 2 - Remove the follow-up sentence
 
-Temporarily change `addEntity` description to:
+Temporarily change `ADD_ENTITY_DESCRIPTION` to:
 
 ```typescript
-description:
-  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates."
+const ADD_ENTITY_DESCRIPTION =
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates.";
 ```
 
 Save, reload, and run the same prompt again:
@@ -234,11 +239,17 @@ Expected behavior: marker is created, but camera may not move automatically.
 
 #### Step 3 - Restore original description
 
-Put the original `addEntity` description back before continuing:
+Put the original `ADD_ENTITY_DESCRIPTION` back before continuing:
+
+> [!TIP]
+>
+> **Quick restore:** Press `Ctrl+Z` (`Cmd+Z` on macOS) to undo your changes and restore the original description.
 
 ```typescript
-description:
-  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.",
+const ADD_ENTITY_DESCRIPTION =
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. " +
+  "Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. " +
+  "IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.";
 ```
 
 > [!TIP]
@@ -269,17 +280,17 @@ Because `flyTo` includes broad phrases like "show me", the model may call both `
 
 #### Step 2 - Fix it with an exclusion rule in `flyTo`
 
-Open [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) and temporarily update `flyTo` description to:
+Open [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts#L41) and temporarily update `FLY_TO_DESCRIPTION` (the text the model reads to decide when to use this tool) to:
 
 ```typescript
-description:
+const FLY_TO_DESCRIPTION =
   "Fly the camera smoothly to a geographic location on the globe. " +
   "Use for pure navigation requests: 'go to', 'fly to', 'zoom in', " +
   "'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. " +
   "Do NOT use for queries about places ('show me restaurants', " +
   "'find museums near', 'what\'s around') - those should go to a " +
   "search/POI tool instead. Does NOT add a marker - use addEntity " +
-  "separately if a pin is needed."
+  "separately if a pin is needed.";
 ```
 
 Save, reload, and retry:
@@ -288,11 +299,13 @@ Save, reload, and retry:
 
 Expected behavior: cleaner selection of `get_points_of_interest` without redundant navigation.
 
-Restore the original `flyTo` description after testing:
+Restore the original `FLY_TO_DESCRIPTION` after testing:
 
 ```typescript
-description:
-  "Fly the camera smoothly to a geographic location on the globe. Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.",
+const FLY_TO_DESCRIPTION =
+  "Fly the camera smoothly to a geographic location on the globe. " +
+  "Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. " +
+  "For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.";
 ```
 
 ![LLM asked to "Show me museums near Paris" responds by only calling get_points_of_interest tool and responding with text. No other tools are invoked.](images/lab3_flyto_exclusion_rule.gif)
@@ -313,7 +326,9 @@ Start with this prompt again:
 
 Without global guidance, responses often stop at data retrieval or result in inconsistent tool sequencing.
 
-Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) and add `TOOL_GUIDANCE` below `ROLE`:
+Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts#L22) and make two changes:
+
+**Step 1 — Add the `TOOL_GUIDANCE` constant** below the `ROLE` block (at the `// TODO` comment on line 22):
 
 ```typescript
 // Global rules that apply across all tools.
@@ -323,14 +338,14 @@ const TOOL_GUIDANCE = `
 - When a search or POI tool returns results with coordinates, call flyTo to navigate
   to the search area, then call addEntity for each result to place a red marker with the place name as a label on the globe.
 `;
+```
 
-// Merge ROLE + TOOL_GUIDANCE into one final system prompt.
+**Step 2 — Update `buildSystemPrompt()`** to include `TOOL_GUIDANCE`:
+
+```typescript
 export function buildSystemPrompt(): string {
   return [ROLE, TOOL_GUIDANCE].join("\n\n");
 }
-
-// Export a pre-built prompt for runtime use.
-export const SYSTEM_PROMPT = buildSystemPrompt();
 ```
 
 Save, reload, and run the same prompt again.
@@ -392,6 +407,10 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 
 <details>
 <summary><strong>Optional deep dive: behavior shaping, ROLE personas & safety policy</strong> (click to expand)</summary>
+
+> [!TIP]
+>
+> **Returning to this later?** You need all three processes running before starting: the app and both MCP servers. From `workshop/lab3_lab4` run `pnpm start:all`, or start them individually — see [Section 1 setup](#section-1--setup-start-here).
 
 System prompts do two things in agentic applications:
 

@@ -52,7 +52,9 @@ export function createTilesetTools(viewerRef: RefObject<Viewer | null>) {
 
     styleTileset: tool({
       description:
-        "Apply a 3D Tiles style to a loaded tileset. Use for 'color the buildings', 'highlight by height', 'change tileset color', 'make buildings red', 'color by property', 'show only tall buildings'. Use color() expressions for a single solid color, or colorConditions for property-based conditional coloring (e.g. color by building height).",
+        "Apply a 3D Tiles style to a loaded tileset. " +
+        "Use for 'color the buildings', 'highlight by height', 'change tileset color', 'make buildings red', 'color by property', 'show only tall buildings'. " +
+        "Use color() expressions for a single solid color, or colorConditions for property-based conditional coloring (e.g. color by building height).",
       inputSchema: styleTilesetSchema,
       execute: async (params): Promise<StyleTilesetOutput> => {
         const viewer = viewerRef.current;

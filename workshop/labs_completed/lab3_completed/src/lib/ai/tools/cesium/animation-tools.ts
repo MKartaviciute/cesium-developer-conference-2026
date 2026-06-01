@@ -30,7 +30,9 @@ export function createAnimationTools(viewerRef: RefObject<Viewer | null>) {
   return {
     animationCreate: tool({
       description:
-        "Create an entity animated along a series of timed position samples. The scene clock is configured to drive the animation. Provide at least two position samples with ISO 8601 timestamps.",
+        "Create an entity animated along a series of timed position samples. " +
+        "The scene clock is configured to drive the animation. " +
+        "Provide at least two position samples with ISO 8601 timestamps.",
       inputSchema: animationCreateSchema,
       execute: async (params): Promise<AnimationCreateOutput> => {
         const viewer = viewerRef.current;
@@ -49,7 +51,8 @@ export function createAnimationTools(viewerRef: RefObject<Viewer | null>) {
 
     animationControl: tool({
       description:
-        "Play or pause an animation created with animationCreate. The scene clock is shared by all animations, so this affects all currently running animations.",
+        "Play or pause an animation created with animationCreate. " +
+        "The scene clock is shared by all animations, so this affects all currently running animations.",
       inputSchema: animationControlSchema,
       execute: async (params): Promise<AnimationControlOutput> => {
         const viewer = viewerRef.current;
@@ -82,7 +85,9 @@ export function createAnimationTools(viewerRef: RefObject<Viewer | null>) {
 
     animationUpdatePath: tool({
       description:
-        "Update an existing animation. Use this to append waypoints (appendPositionSamples), replace the full path (replacePositionSamples), and/or adjust the path trail appearance (lead/trail time, line width, colour).",
+        "Update an existing animation. " +
+        "Use this to append waypoints (appendPositionSamples), replace the full path (replacePositionSamples), " +
+        "and/or adjust the path trail appearance (lead/trail time, line width, colour).",
       inputSchema: animationUpdatePathSchema,
       execute: async (params): Promise<AnimationUpdatePathOutput> => {
         const viewer = viewerRef.current;
@@ -93,7 +98,8 @@ export function createAnimationTools(viewerRef: RefObject<Viewer | null>) {
 
     animationCameraTracking: tool({
       description:
-        "Lock the camera to follow an animated entity (track=true) or release camera control back to the user (track=false). If animationId is omitted with track=true, the newest active animation is tracked.",
+        "Lock the camera to follow an animated entity (track=true) or release camera control back to the user (track=false). " +
+        "If animationId is omitted with track=true, the newest active animation is tracked.",
       inputSchema: animationCameraTrackingSchema,
       execute: async (params): Promise<AnimationCameraTrackingOutput> => {
         const viewer = viewerRef.current;
