@@ -42,7 +42,7 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 
 ## Section 4 — Setup
 
-**Files you will modify in this lab:**
+**Files you will look at in this lab:**
 - [`.env`](lab1_lab2/.env) - add (copy from `.env.example`)
 - [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) - pre-populated (no edits needed)
 - [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) - uncomment (pre-populated)

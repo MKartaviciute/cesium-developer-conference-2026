@@ -47,7 +47,7 @@ The app currently looks like the end of Lab 1: `flyTo` works, but no external MC
 
 ## Section 4 — Setup
 
-**Files you will modify in this lab:**
+**Files you will look at in this lab:**
 - [`packages/mcp-poi/package.json`](lab1_lab2/packages/mcp-poi/package.json) - pre-populated (no edits needed)
 - [`packages/mcp-poi/tsconfig.json`](lab1_lab2/packages/mcp-poi/tsconfig.json) - pre-populated (no edits needed)
 - [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) - pre-populated (no edits needed)
@@ -636,6 +636,8 @@ The agent should:
 3. Call `flyTo` using the earthquake's latitude and longitude.
 
 The globe animates to the epicenter of the strongest recent earthquake — an MCP server and a Cesium tool chaining together in one conversational turn.
+
+![A looping screen capture of the globe animating to the epicenter of the strongest recent earthquake — an MCP server and a Cesium tool chaining together in one conversational turn.](images/lab2_bonus_earthquake_mcp_added.gif)
 
 > [!TIP]
 >
