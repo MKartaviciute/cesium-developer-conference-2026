@@ -1,10 +1,10 @@
 # Lab 3 — System prompts and tool descriptions
 
-**Time:** ~20 minutes
+**Time:** ~20 minutes | **Required workspace:** `workshop/lab3_lab4/` _(new workspace — separate from Labs 1 & 2)_
 
 ---
 
-## Section 1 — Introduction
+## Overview
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
@@ -12,11 +12,9 @@ Connecting tools to an AI agent is only half the work. The AI still has to decid
 
 Here is the surprising part: you do not fix this by writing more code. You fix it by writing better *English*. The AI reads your tool descriptions and system prompt the same way it reads any text, and decides what to do based on the words you chose. Change a single sentence and you change the behavior. This lab is about learning to write those sentences deliberately.
 
----
+In Labs 1–2 you built tools from the ground up. Now the perspective flips: this lab starts with a rich toolkit already assembled (42 Cesium tools + 4 MCP tools), and the focus shifts to **orchestration** — teaching the agent which tools to use, when, and in what order, entirely through natural language.
 
-## Section 2 — Goal
-
-In this lab you will:
+**In this lab you will:**
 
 - Edit tool descriptions and observe how tool selection changes.
 - Add global `TOOL_GUIDANCE` rules to the system prompt.
@@ -24,24 +22,19 @@ In this lab you will:
 
 By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rome"** should trigger a cleaner multi-step flow (search, navigate, and visualize).
 
----
-
-## Section 3 — What's already implemented
+### What's already implemented
 
 | Feature | Status | Source code |
 |---|---|---|
-| Cesium toolset | 42 tools pre-wired | [`src/lib/ai/tools/cesium/`](lab3_lab4/src/lib/ai/tools/cesium/) |
-| MCP toolset | 4 tools pre-wired<br>2 MCP servers<br>(POI + Weather) | [`packages/mcp-poi/`](lab3_lab4/packages/mcp-poi/), [`packages/mcp-weather/`](lab3_lab4/packages/mcp-weather/) |
+| Cesium toolset | 42 tools pre-wired | [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) |
+| MCP toolset | 4 tools pre-wired<br>2 MCP servers<br>(POI + Weather) | [`packages/mcp-poi/src/poi-server.ts`](lab3_lab4/packages/mcp-poi/src/poi-server.ts), [`packages/mcp-weather/src/weather-server.ts`](lab3_lab4/packages/mcp-weather/src/weather-server.ts) |
 | MCP server config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
 | Chat tool wiring | Cesium + MCP tools already merged in chat | [`src/components/chat/ChatPanel.tsx`](lab3_lab4/src/components/chat/ChatPanel.tsx) |
 | System prompt | `ROLE` only, no `TOOL_GUIDANCE` yet | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
 | Tool descriptions | Present and editable | [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts), [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) |
 
-> [!NOTE]
->
-> We have added additional tools for you to accelerate the workshop. Take a look below at the list of tools.
-
-Tool inventory loaded in this lab:
+<details>
+<summary><strong>Full tool inventory loaded in this lab</strong> (click to expand)</summary>
 
 | Category | Tools |
 |---|---|
@@ -56,40 +49,90 @@ Tool inventory loaded in this lab:
 | MCP (POI) | `get_points_of_interest` |
 | MCP (Weather) | `get_current_weather`, `get_forecast`, `get_historical_weather` |
 
+</details>
+
 > [!IMPORTANT]
 >
 > The current system prompt only contains a `ROLE` description. There are no rules yet influencing how tools should be used.
 
 ---
 
-## Section 4 — Setup
+## Section 1 — Setup (start here)
 
-**Files you will modify in this lab:**
-- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
-- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
-- [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
-- [`packages/mcp-poi/src/tools/index.ts`](lab3_lab4/packages/mcp-poi/src/tools/index.ts) - optional challenge only
-- [`.env`](lab3_lab4/.env) - add
+> [!IMPORTANT]
+>
+> **This is a new workspace.** Labs 3 & 4 use `workshop/lab3_lab4/` — a separate directory from `lab1_lab2/`. You do not need any code from Labs 1–2; everything is pre-wired here. Close any active Lab 1 or Lab 2 terminals before starting.
 
-You may close any active terminals from Lab 1 or Lab 2 at this time. Navigate to the `lab3_lab4` directory and prepare the code base:
+> [!TIP]
+>
+> **Token cost of tools:** This workspace loads 46 tools on every request (42 Cesium + 4 MCP). That is a significant baseline token cost even before any tool is called. If you are experimenting with only a subset of tools, comment out unused tool registrations in [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) — fewer tools means cheaper requests and less routing confusion.
+
+### Step 1 — Install dependencies
+
+Navigate to the `lab3_lab4` directory and prepare the code base:
 
 ```bash
 cd workshop/lab3_lab4
 pnpm install
 ```
 
-Add [`.env`](lab3_lab4/.env) next to [`.env.example`](lab3_lab4/.env.example) (you may copy this from the previous labs):
+### Step 2 — Create your `.env` file
 
-```env
-OPENAI_API_KEY=sk-...
-AI_BASE_URL=
-AI_MODEL=gpt-5.4
+Copy [`.env.example`](lab3_lab4/.env.example) to [`.env`](lab3_lab4/.env) (or reuse the values from Lab 1):
 
-# Optional
-CESIUM_ION_ACCESS_TOKEN=...
+```bash
+copy .env.example .env  # Windows
+# cp .env.example .env  # macOS/Linux
 ```
 
-### Start all processes (3 separate terminals)
+> [!TIP]
+>
+> No terminal needed: in the VS Code file explorer, right-click `.env.example` → **Copy**, then right-click → **Paste**, and rename the copy to `.env`.
+
+Then fill in your API key values:
+
+```env
+OPENAI_API_KEY=your_key_here
+AI_BASE_URL=your_base_url_here
+AI_MODEL=your_model_name_here
+
+# Optional
+CESIUM_ION_ACCESS_TOKEN=
+```
+
+> [!NOTE]
+>
+> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
+>
+> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
+
+### Step 3 — Start all processes
+
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
+
+This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
+
+```bash
+cd workshop/lab3_lab4
+pnpm start:all
+```
+
+Once ready, the app terminal will show something like:
+
+```
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.237:3000
+- Environments: .env
+✓ Ready in 2.9s
+```
+
+Open a browser and navigate to **http://localhost:3000**.
+
+<details>
+<summary>Prefer three separate terminals? (click to expand)</summary>
 
 ```bash
 # Terminal 1 - POI server (port 3001)
@@ -109,7 +152,11 @@ cd workshop/lab3_lab4
 pnpm dev
 ```
 
-The app auto-connects to both MCP servers through `src/lib/mcp-servers.config.ts`.
+Once the app server is ready, open a browser and navigate to **http://localhost:3000**.
+
+</details>
+
+The app auto-connects to both MCP servers through [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts).
 
 ![Lab 3 starting view — 42 Cesium tools and 4 MCP tools](images/lab3_starting_state.gif)
 
@@ -117,9 +164,16 @@ The app auto-connects to both MCP servers through `src/lib/mcp-servers.config.ts
 >
 > In the tools panel, verify you can see **42 Cesium tools** and **4 MCP tools** before starting experiments.
 
+**Files you will modify in this lab:**
+- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
+- [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
+- [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
+- the MCP tool-definitions file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab3_lab4/packages/mcp-poi/src/tools/poi-tools.ts) - optional challenge only
+- [`.env`](lab3_lab4/.env) - add
+
 ---
 
-## Section 5 — Verify baseline behavior
+## Section 2 — Verify baseline behavior
 
 > [!TIP]
 >
@@ -135,7 +189,7 @@ This is expected. We have the tools, but orchestration is limited.
 
 ---
 
-## Section 6 — Tool descriptions drive behavior
+## Section 3 — Tool descriptions drive behavior
 
 Tool descriptions influence both:
 - **when** a tool is chosen
@@ -180,7 +234,12 @@ Expected behavior: marker is created, but camera may not move automatically.
 
 #### Step 3 - Restore original description
 
-Put the original follow-up instruction back before continuing.
+Put the original `addEntity` description back before continuing:
+
+```typescript
+description:
+  "Add a named point, billboard, or label marker to the 3D globe at the given coordinates. Use for requests like 'drop a pin', 'place a marker', 'mark this location', 'add a waypoint', 'flag this spot', or 'put a dot on the map'. IMPORTANT: after a successful result you MUST immediately call flyTo using the returned latitude and longitude to show the user the new marker.",
+```
 
 > [!TIP]
 >
@@ -229,7 +288,12 @@ Save, reload, and retry:
 
 Expected behavior: cleaner selection of `get_points_of_interest` without redundant navigation.
 
-Restore the original description after testing.
+Restore the original `flyTo` description after testing:
+
+```typescript
+description:
+  "Fly the camera smoothly to a geographic location on the globe. Use for any navigation request: 'go to', 'show me', 'fly to', 'zoom in', 'zoom into', 'take me to', 'navigate to', 'gradually zoom in'. For a gradual zoom-in effect, set a longer duration (e.g. 6–10 s). Does NOT add a marker — use addEntity separately if a pin is needed.",
+```
 
 ![LLM asked to "Show me museums near Paris" responds by only calling get_points_of_interest tool and responding with text. No other tools are invoked.](images/lab3_flyto_exclusion_rule.gif)
 
@@ -239,7 +303,7 @@ Restore the original description after testing.
 
 ---
 
-## Section 7 — Orchestrating tool chains with your system prompt
+## Section 4 — Orchestrating tool chains with your system prompt
 
 Now we will add global behavior rules that can span multiple tools.
 
@@ -281,7 +345,7 @@ Save, reload, and run the same prompt again.
 
 ---
 
-## Section 8 — A completed example
+## Section 5 — A completed example
 
 After some trial and error, your [`system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
 
@@ -313,7 +377,7 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 
 ---
 
-## Section 9 — When to use tool descriptions vs system prompt
+## Section 6 — When to use tool descriptions vs system prompt
 
 | Use tool descriptions for... | Use the system prompt for... |
 |---|---|
@@ -325,6 +389,9 @@ export const SYSTEM_PROMPT = buildSystemPrompt();
 ---
 
 ## Bonus — Behavior shaping and tool chain orchestration
+
+<details>
+<summary><strong>Optional deep dive: behavior shaping, ROLE personas & safety policy</strong> (click to expand)</summary>
 
 System prompts do two things in agentic applications:
 
@@ -436,7 +503,7 @@ or narrative descriptions. You have direct control of a CesiumJS 3D globe viewer
 
 Run the same two prompts. The open-ended question ("Paris or Rome?") is where the contrast is sharpest — a single factual sentence instead of a travel pitch.
 
-#### Restore for the next section
+#### Restore before moving on
 
 Put back the original `ROLE` before continuing:
 
@@ -513,8 +580,17 @@ Reload and run the same prompt again. **With `SAFEGUARDS`:** the model should li
 >
 > Safety rules belong in their own named block (`SAFEGUARDS`), separate from `TOOL_GUIDANCE`. This makes them easy to audit, update, and reuse across agents without touching the orchestration logic.
 
+</details>
+
 ---
 
-## Section 9 — What's next
+## Section 7 — What's next
+
+> [!TIP]
+>
+> **Want to learn more?**
+> - **Token budgeting & deferred tool loading** — with 46+ tools loaded, every request carries significant baseline cost. Load tool definitions lazily so the model only sees what it needs per turn. For quick savings, remove or comment out tool registrations you don't need — fewer tools means cheaper requests and less routing confusion. Example: [OpenAI Tool Search](https://developers.openai.com/api/docs/guides/tools-tool-search).
+> - **Skills — reusable prompt packages** — bundle tool definitions and instructions into versioned, shareable units that agents load on demand. Example: [OpenAI Skills](https://developers.openai.com/api/docs/guides/tools-skills), [Agent Skills standard](https://agentskills.io/home).
+> - **Conditional tool filtering** — only register the tools relevant to the current context instead of exposing everything upfront. In any SDK you can filter the tool array per request; some providers also offer built-in primitives (e.g. OpenAI [Namespaces](https://developers.openai.com/api/docs/guides/function-calling#defining-namespaces)).
 
 In [**Lab 4 — Free exploration with public datasets**](LAB_4_challenge.md), you will combine datasets and tool-chaining patterns to explore more complex geospatial requests and generate your own unique insights projected onto the Cesium globe.

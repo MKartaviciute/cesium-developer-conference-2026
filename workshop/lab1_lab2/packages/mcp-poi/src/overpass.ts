@@ -1,9 +1,11 @@
 /**
+ * Lab 2 — Section 2, Step 1 (📖 Review only)
+ *
  * Typed fetch wrapper for the Overpass API (OpenStreetMap).
  * No API key required.
  *
  * This file is pre-populated — no edits needed here.
- * Your work for Lab 2 is in packages/mcp-poi/src/tools/index.ts.
+ * Your work for Lab 2 is in packages/mcp-poi/src/tools/poi-tools.ts.
  */
 
 // Public Overpass endpoint used by this MCP server.

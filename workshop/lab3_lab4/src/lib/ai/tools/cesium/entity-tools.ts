@@ -1,3 +1,9 @@
+/**
+ * Lab 3 — Section 3, Part A (✏️ Edit descriptions)
+ *
+ * Experiment with the `addEntity` description to observe follow-up behavior.
+ * See LAB_3.md Section 3 for step-by-step instructions.
+ */
 "use client";
 
 import { tool } from "ai";

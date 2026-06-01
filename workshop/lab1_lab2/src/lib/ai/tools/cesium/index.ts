@@ -8,7 +8,7 @@ import type { Viewer } from "cesium";
  * Stub for camera tools — students will replace this with their implementation.
  */
 function createCameraTools(_viewerRef: RefObject<Viewer | null>): Record<string, Tool> {
-  // TODO (Lab 1): Implement your camera tools here
+  // TODO (Lab 1 — Section 4): Implement your camera tools here
   return {};
 }
 
@@ -23,9 +23,7 @@ export interface CesiumToolGroup {
 /**
  * Build Cesium tools grouped by their owning domain module.
  *
- * Lab 1 — Camera tools only. Once you implement camera-tools.ts,
- * update the import statement at the top to use it:
- *   import { createCameraTools } from "./camera-tools";
+ * Lab 1 — Camera tools only.
  */
 export function createCesiumToolGroups(
   viewerRef: RefObject<Viewer | null>,

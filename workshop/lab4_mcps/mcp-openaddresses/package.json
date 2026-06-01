@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/openaddresses-server.ts",
+    "start": "tsx src/openaddresses-server.ts",
     "download-data": "tsx src/download-data.ts"
   },
   "dependencies": {
