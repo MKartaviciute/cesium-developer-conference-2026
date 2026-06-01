@@ -724,6 +724,7 @@ In [**Lab 3 — System prompts and tool descriptions**](LAB_3.md), you will shap
 | MCP server will not start | Confirm `pnpm install` finished in `packages/mcp-poi` and port `3001` is free. |
 | Agent does not call MCP tool | Check the tool description and make the prompt more explicit. |
 | CORS errors | Ensure the MCP server includes CORS headers for `http://localhost:3000`. |
+| `Overpass API error 504` | The public Overpass server is temporarily overloaded — the client retries automatically (up to 3 attempts). If it keeps failing, wait 30 seconds and try again. |
 
 </details>
 
