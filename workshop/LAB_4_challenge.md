@@ -80,6 +80,18 @@ cd workshop/lab3_lab4
 pnpm start:all
 ```
 
+Once ready, the app terminal will show something like:
+
+```
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.237:3000
+- Environments: .env
+✓ Ready in 2.9s
+```
+
+Open a browser and navigate to **http://localhost:3000**.
+
 <details>
 <summary>Prefer three separate terminals? (click to expand)</summary>
 
@@ -100,6 +112,8 @@ pnpm dev
 cd workshop/lab3_lab4
 pnpm dev
 ```
+
+Once the app server is ready, open a browser and navigate to **http://localhost:3000**.
 
 </details>
 

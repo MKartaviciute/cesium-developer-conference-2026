@@ -77,11 +77,23 @@ AI_MODEL=your_model_name_here
 >
 > Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
-Now run the app and open a new browser tab to http://localhost:3000:
+Now run the app:
 
 ```bash
-pnpm dev # → http://localhost:3000
+pnpm dev
 ```
+
+Once ready, the terminal will show something like:
+
+```
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.237:3000
+- Environments: .env
+✓ Ready in 2.9s
+```
+
+Open a browser and navigate to **http://localhost:3000**.
 
 > [!IMPORTANT]
 >
@@ -262,7 +274,7 @@ Completely remove the local `createCameraTools` stub function and add the follow
 ```
 
 <details>
-<summary>Full file — copy-paste to avoid stub deletion mistakes</summary>
+<summary>Full file — copy-paste to avoid stub deletion mistakes (click to expand)</summary>
 
 Replace the **entire contents** of `cesium/index.ts` with the following (the only change from the starter file is the first line — the import replaces the stub function):
 

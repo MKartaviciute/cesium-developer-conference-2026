@@ -1,0 +1,74 @@
+{
+  // One-click ways to run the workshop apps without typing terminal commands.
+  // Open the Command Palette (Ctrl+Shift+P / Cmd+Shift+P) -> "Tasks: Run Task"
+  // and pick one of the tasks below. Each task opens its own terminal panel.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lab 1 & 2: Start everything (app + POI server)",
+      "dependsOn": [
+        "Lab 1 & 2: App (port 3000)",
+        "Lab 2: POI MCP server (port 3001)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Lab 3 & 4: Start everything (app + POI + Weather)",
+      "dependsOn": [
+        "Lab 3 & 4: App (port 3000)",
+        "Lab 3 & 4: POI MCP server (port 3001)",
+        "Lab 3 & 4: Weather MCP server (port 3002)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Lab 1 & 2: App (port 3000)",
+      "type": "shell",
+      "command": "pnpm dev",
+      "options": { "cwd": "${workspaceFolder}/workshop/lab1_lab2" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "lab12", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab 2: POI MCP server (port 3001)",
+      "type": "shell",
+      "command": "pnpm dev",
+      "options": { "cwd": "${workspaceFolder}/workshop/lab1_lab2/packages/mcp-poi" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "lab12", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab 3 & 4: App (port 3000)",
+      "type": "shell",
+      "command": "pnpm dev",
+      "options": { "cwd": "${workspaceFolder}/workshop/lab3_lab4" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "lab34", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab 3 & 4: POI MCP server (port 3001)",
+      "type": "shell",
+      "command": "pnpm dev",
+      "options": { "cwd": "${workspaceFolder}/workshop/lab3_lab4/packages/mcp-poi" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "lab34", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab 3 & 4: Weather MCP server (port 3002)",
+      "type": "shell",
+      "command": "pnpm dev",
+      "options": { "cwd": "${workspaceFolder}/workshop/lab3_lab4/packages/mcp-weather" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "lab34", "panel": "dedicated" }
+    }
+  ]
+}
