@@ -262,7 +262,7 @@ Agent:
 
 ---
 
-<summary><strong>After the workshop</strong></summary>
+## After the workshop
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
