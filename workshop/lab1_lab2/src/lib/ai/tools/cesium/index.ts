@@ -8,7 +8,7 @@ import type { Viewer } from "cesium";
  * Stub for camera tools — students will replace this with their implementation.
  */
 function createCameraTools(_viewerRef: RefObject<Viewer | null>): Record<string, Tool> {
-  // TODO (Lab 1): Implement your camera tools here
+  // TODO (Lab 1 — Section 4): Implement your camera tools here
   return {};
 }
 

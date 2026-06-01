@@ -65,11 +65,9 @@ By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rom
 
 > [!TIP]
 >
-> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
-
-> [!TIP]
->
 > **Token cost of tools:** This workspace loads 46 tools on every request (42 Cesium + 4 MCP). That is a significant baseline token cost even before any tool is called. If you are experimenting with only a subset of tools, comment out unused tool registrations in [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) — fewer tools means cheaper requests and less routing confusion.
+
+### Step 1 — Install dependencies
 
 Navigate to the `lab3_lab4` directory and prepare the code base:
 
@@ -77,6 +75,8 @@ Navigate to the `lab3_lab4` directory and prepare the code base:
 cd workshop/lab3_lab4
 pnpm install
 ```
+
+### Step 2 — Create your `.env` file
 
 Copy [`.env.example`](lab3_lab4/.env.example) to [`.env`](lab3_lab4/.env) (or reuse the values from Lab 1):
 
@@ -106,7 +106,11 @@ CESIUM_ION_ACCESS_TOKEN=
 >
 > Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
-### Start all processes
+### Step 3 — Start all processes
+
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
 
 This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
 

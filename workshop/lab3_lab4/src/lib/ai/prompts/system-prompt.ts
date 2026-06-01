@@ -1,7 +1,9 @@
 /**
- * System prompt for the Cesium geospatial AI agent.
+ * Lab 3 — Section 4 (✏️ You implement)
  *
- * Starts with only a ROLE description. 
+ * System prompt for the Cesium geospatial AI agent.
+ * Starts with only a ROLE description — you will add TOOL_GUIDANCE in Section 4.
+ * See LAB_3.md Section 4 for the exact content to add.
  */
 
 
