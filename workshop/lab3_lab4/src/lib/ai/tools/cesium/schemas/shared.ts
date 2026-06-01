@@ -37,8 +37,8 @@ export function isAllowedUrl(url: string): boolean {
 // ---------------------------------------------------------------------------
 
 export const latLonAltSchema = z.object({
-  latitude: z.number().describe("Latitude in decimal degrees"),
-  longitude: z.number().describe("Longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()

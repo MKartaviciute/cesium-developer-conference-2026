@@ -1,24 +1,28 @@
 # Lab 2 — Build an MCP server
 
-**Time:** ~20 minutes
+**Time:** ~20 minutes | **Required workspace:** `workshop/lab1_lab2/`
 
 ---
 
-## Section 1 — Introduction
+## Overview
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
 The AI knows a lot from its training data, but that knowledge is frozen in time and occasionally wrong. Ask it "is it raining in Philadelphia right now?" and it will answer from memory — which may already be out of date by the time you read its reply. The fix is to stop relying on the AI's memory and instead give it a live data source it can query on demand.
 
-That is what MCP does. Think of it like a USB port for AI: a standard plug that lets you connect any external data source — a map database, a weather service, a company spreadsheet — without rewriting your app each time. Once a tool is published as an MCP server, any AI client that speaks the protocol can use it. You build it once; it works everywhere.
+### What is MCP?
 
----
+**[MCP (Model Context Protocol)](https://modelcontextprotocol.io/docs/getting-started/intro)** is a standard way for LLM clients to discover and call tools exposed by external servers. Think of it like a USB port for AI: a standard plug that lets you connect any external data source — a map database, a weather service, a company spreadsheet — without rewriting your app each time. You build a tool once; any AI client that speaks the protocol can use it.
 
-## Section 2 — Goal
+Instead of hardcoding every external request as a tool inside your chat app, you host tools on an MCP server and let any MCP-compatible client consume them.
+
+![Sequence diagram showing the MCP flow: User sends a message to the Next.js Chat App, which calls the MCP Server, which queries the Overpass API and returns results back through the chain](images/lab2_mcp_sequence.png)
+
+### Goal
 
 Lab 2 starts where Lab 1 left off. The `flyTo` Cesium tool is working, so the agent can move the camera.
 
-In this lab you will:
+**In this lab you will:**
 
 - Build an external MCP server package from scratch.
 - Add a real tool (`get_points_of_interest`) backed by [OpenStreetMap's Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API).
@@ -27,13 +31,11 @@ In this lab you will:
 
 By the end, prompts like **"Find attractions in Barcelona and fly to the first one"** should trigger both MCP and Cesium tools in one turn.
 
----
-
-## Section 3 — What's already implemented
+### What's already implemented
 
 | Feature | Status | Source code |
 |---|---|---|
-| `flyTo` Cesium tool | Working from Lab 1 | `src/lib/ai/tools/cesium/camera-tools.ts` |
+| `flyTo` Cesium tool | Working from Lab 1 | [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) |
 | MCP connection hook | Implemented | [`src/hooks/useMcpServers.ts`](lab1_lab2/src/hooks/useMcpServers.ts) |
 | MCP status context | Implemented | [`src/contexts/McpStatusContext.tsx`](lab1_lab2/src/contexts/McpStatusContext.tsx) |
 | MCP server config | Empty - ready for new MCP servers | [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) |
@@ -45,56 +47,55 @@ The app currently looks like the end of Lab 1: `flyTo` works, but no external MC
 
 ---
 
-## Section 4 — Setup
+## Section 1 — Setup (start here)
 
-**Files you will modify in this lab:**
-- [`packages/mcp-poi/package.json`](lab1_lab2/packages/mcp-poi/package.json) - pre-populated (no edits needed)
-- [`packages/mcp-poi/tsconfig.json`](lab1_lab2/packages/mcp-poi/tsconfig.json) - pre-populated (no edits needed)
-- [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) - pre-populated (no edits needed)
-- [`packages/mcp-poi/src/tools/index.ts`](lab1_lab2/packages/mcp-poi/src/tools/index.ts) - uncomment (pre-populated)
-- [`packages/mcp-poi/src/index.ts`](lab1_lab2/packages/mcp-poi/src/index.ts) - pre-populated (no edits needed)
-- [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) - edit (register your MCP server)
-- [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (merge MCP tools into chat)
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: Start everything (app + POI server)"** to start the app and the MCP server together. The POI server starts before you uncomment the tool, but `pnpm dev` uses `tsx watch` — it auto-reloads as soon as you save your changes in Section 2.
 
-Lab 2 continues in the same workspace as Lab 1: `workshop/lab1_lab2`. See [Lab 1 setup](LAB_1.md#section-4--setup) if you are behind. If you have closed the terminal from Lab 1, please open a new terminal and start the app server again.
+Lab 2 continues in the same workspace as Lab 1: `workshop/lab1_lab2`. See [Lab 1 setup](LAB_1.md#section-1--setup-start-here) if you are behind. If you closed the terminal from Lab 1, open a new terminal and start the app server again.
 
 ```bash
 cd workshop/lab1_lab2
-pnpm dev # -> http://localhost:3000
+pnpm dev # → http://localhost:3000
 ```
+
+> [!TIP]
+>
+> **Already have the app running from Lab 1?** You can skip the `pnpm dev` step — the app is still running on port 3000. If you hit a port conflict on any port, run `npx kill-port 3000 3001 3002` to free them all, then restart.
 
 > [!IMPORTANT]
 >
 > Keep this app terminal running. You will open a second terminal soon for the MCP server.
 
+**Files you will modify in this lab:**
+- [`packages/mcp-poi/package.json`](lab1_lab2/packages/mcp-poi/package.json) - pre-populated (no edits needed)
+- [`packages/mcp-poi/tsconfig.json`](lab1_lab2/packages/mcp-poi/tsconfig.json) - pre-populated (no edits needed)
+- [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) - pre-populated (no edits needed)
+- the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts) - uncomment (pre-populated)
+- the MCP **server entry point** [`packages/mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) - pre-populated (no edits needed)
+- [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) - edit (register your MCP server)
+- [`src/components/chat/ChatPanel.tsx`](lab1_lab2/src/components/chat/ChatPanel.tsx) - edit (merge MCP tools into chat)
+
 ---
 
-## Section 5 — What is MCP?
+> [!NOTE]
+>
+> **Two kinds of steps in this lab.** Watch for these badges on each step:
+> - 📖 **Review only** — read and understand existing code. **You do not edit anything.**
+> - ✏️ **You implement** — you actually change code here (uncomment a block, add an import, or edit a file).
 
-**[MCP (Model Context Protocol)](https://modelcontextprotocol.io/docs/getting-started/intro)** is a standard way for LLM clients to discover and call tools exposed by external servers.
-
-Instead of hardcoding every external request as a tool inside your chat app, you can host tools on an MCP server and enable any MCP-compatible client to consume them.
-
-![Sequence diagram showing the MCP flow: User sends a message to the Next.js Chat App, which calls the MCP Server, which queries the Overpass API and returns results back through the chain](images/lab2_mcp_sequence.png)
-
----
-
-## Section 6 — Create the MCP server
+## Section 2 — Create the MCP server
 
 You will build a standalone MCP server package that queries OpenStreetMap Overpass for points of interest in order to supercharge the LLM agent's ability to precisely locate places and move the camera accordingly.
 
-### Step 1 - Install the MCP package dependencies
+The `packages/mcp-poi/` directory is already scaffolded with `package.json`, `tsconfig.json`, and all source files pre-populated — and its dependencies were installed when you ran `pnpm install` in Section 1.
 
-The `packages/mcp-poi/` directory is already scaffolded with `package.json`, `tsconfig.json`, and all source files pre-populated. Navigate to the package and install its dependencies:
+### Step 1 - Review the Overpass API client
 
-```bash
-cd workshop/lab1_lab2
-pnpm install
-```
+> 📖 **Review only** — read and understand this file. No edits needed.
 
-### Step 2 - Review the Overpass API client
-
-Open [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) and review the pre-populated code. It exposes two things: an interface for `PointOfInterest` responses and a `searchPois()` function that wraps the Overpass HTTP API. This is the equivalent of `src/lib/cesium/camera.ts` from Lab 1 — infrastructure code you call from your tool.
+Open [`packages/mcp-poi/src/overpass.ts`](lab1_lab2/packages/mcp-poi/src/overpass.ts) and review the pre-populated code. It exposes two things: an interface for `PointOfInterest` responses and a `searchPois()` function that wraps the Overpass HTTP API. This is the equivalent of [`src/lib/cesium/camera.ts`](lab1_lab2/src/lib/cesium/camera.ts) from Lab 1 — infrastructure code you call from your tool.
 
 ```typescript
 // Public Overpass endpoint used by this MCP server.
@@ -133,73 +134,20 @@ export async function searchPois(
 }
 ```
 
-No edits are needed here. Continue to Step 3.
+No edits are needed here. Continue to Step 2.
 
-### Step 3 - Register the MCP tool
+### Step 2 - Review the server entry point
 
-Here we are defining the first tool on this MCP server. The syntax is slightly different from `src/lib/ai/tools/cesium/camera-tools.ts` in Lab 1, but the content should look familiar — a name, a description, input parameters with types, and an execute function.
+> 📖 **Review only** — read and understand this file. No edits needed.
 
-Open [`packages/mcp-poi/src/tools/index.ts`](lab1_lab2/packages/mcp-poi/src/tools/index.ts). The file has a skeleton and a commented-out implementation.
-
-**Uncomment the `registerPoiTools` function** (remove the `//` prefix from each line in the commented block). After uncommenting, your file should look like this:
-
-```typescript
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { searchPois } from "../overpass.js";
-
-// Register all POI-related tools on the MCP server instance.
-export function registerPoiTools(server: McpServer) {
-  server.registerTool(
-    // Tool name exposed over MCP.
-    "get_points_of_interest",
-    {
-      // Tool description used by the LLM for intent matching.
-      description:
-        "Search for real-world points of interest near a location using OpenStreetMap data. " +
-        "Returns name, coordinates, and tags for each result. " +
-        "Supported types include: museum, attraction, monument, restaurant, cafe, park, hotel, viewpoint, artwork, theatre.",
-      // Input schema defines arguments and descriptions for the model.
-      inputSchema: {
-        latitude: z.number().describe("Center latitude (e.g. 48.8566 for Paris)"),
-        longitude: z.number().describe("Center longitude (e.g. 2.3522 for Paris)"),
-        type: z
-          .string()
-          .describe(
-            "Type of POI to search for (e.g. 'museum', 'attraction', 'monument', 'restaurant', 'cafe', 'park')",
-          ),
-        radius: z
-          .number()
-          .optional()
-          .describe("Search radius in meters (default 5000)"),
-      },
-    },
-    async ({ latitude, longitude, type, radius }) => {
-      // Call the Overpass client and return the results as MCP text content.
-      const results = await searchPois(latitude, longitude, type, radius);
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(results, null, 2),
-          },
-        ],
-      };
-    },
-  );
-}
-```
-
-### Step 4 - Review the server entry point
-
-Open [`packages/mcp-poi/src/index.ts`](lab1_lab2/packages/mcp-poi/src/index.ts) and review the pre-populated code. It creates an Express app that hosts a `/mcp` endpoint. Because MCP is an open standard, we can rely on public libraries from `@modelcontextprotocol/sdk` for most of the heavy lifting.
+Open the MCP **server entry point** [`packages/mcp-poi/src/poi-server.ts`](lab1_lab2/packages/mcp-poi/src/poi-server.ts) and review the pre-populated code. It creates an Express app that hosts a `/mcp` endpoint. Because MCP is an open standard, we can rely on public libraries from `@modelcontextprotocol/sdk` for most of the heavy lifting.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import cors from "cors";
-import { registerPoiTools } from "./tools/index.js";
+import { registerPoiTools } from "./tools/poi-tools.js";
 
 const app = express();
 const allowedOrigin = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
@@ -231,9 +179,74 @@ app.listen(PORT, () => {
 });
 ```
 
-No edits are needed here. Continue to Step 5.
+No edits are needed here. Continue to Step 3.
 
-### Step 5 - Start the MCP server
+### Step 3 - Register the MCP tool
+
+> ✏️ **You implement** — you uncomment the tool definition in this step.
+
+Here we are defining the first tool on this MCP server. The syntax is slightly different from [`src/lib/ai/tools/cesium/camera-tools.ts`](lab1_lab2/src/lib/ai/tools/cesium/camera-tools.ts) in Lab 1, but the content should look familiar — a name, a description, input parameters with types, and an execute function.
+
+Open the MCP **tool-definitions** file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab1_lab2/packages/mcp-poi/src/tools/poi-tools.ts). The file has a skeleton and a commented-out implementation.
+
+The implementation is pre-written but commented out so you can read through each piece before making it active. **Uncomment the `registerPoiTools` function** by removing the leading `// ` prefix from each line in the commented block. The real explanatory comments inside the block use the `/* ... */` style, so they remain comments after you uncomment. After uncommenting, your file should look like this:
+
+> [!TIP]
+>
+> **Fast way to uncomment in VS Code:** select every line of the commented block, then press `Ctrl+/` (`Cmd+/` on macOS) to toggle the comments off all at once.
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import { searchPois } from "../overpass.js";
+
+// Register all POI-related tools on the MCP server instance.
+export function registerPoiTools(server: McpServer) {
+  server.registerTool(
+    /* Tool name exposed over MCP. */
+    "get_points_of_interest",
+    {
+      /* Tool description used by the LLM for intent matching. */
+      description:
+        "Search for real-world points of interest near a location using OpenStreetMap data. " +
+        "Returns name, coordinates, and tags for each result. " +
+        "Supported types include: museum, attraction, monument, restaurant, cafe, park, hotel, viewpoint, artwork, theatre.",
+      /* Input schema defines arguments and descriptions for the model. */
+      inputSchema: {
+        latitude: z.number().describe("Center latitude (e.g. 48.8566 for Paris)"),
+        longitude: z.number().describe("Center longitude (e.g. 2.3522 for Paris)"),
+        type: z
+          .string()
+          .describe(
+            "Type of POI to search for (e.g. 'museum', 'attraction', 'monument', 'restaurant', 'cafe', 'park')",
+          ),
+        radius: z
+          .number()
+          .optional()
+          .describe("Search radius in meters (default 5000)"),
+      },
+    },
+    async ({ latitude, longitude, type, radius }) => {
+      /* Call the Overpass client and return the results as MCP text content. */
+      const results = await searchPois(latitude, longitude, type, radius);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(results, null, 2),
+          },
+        ],
+      };
+    },
+  );
+}
+```
+
+### Step 4 - Start the MCP server
+
+> [!TIP]
+>
+> **Already running the VS Code "Start everything" task from Section 1?** The POI server is already running — `pnpm dev` uses `tsx watch`, so it auto-reloads whenever you save a file. Your tool is now live. Skip the commands below and go straight to [Section 3](#section-3--register-the-server-in-the-app).
 
 Open a new terminal window. Switch to the `mcp-poi` package directory and start the MCP server using the following commands:
 
@@ -242,21 +255,26 @@ cd workshop/lab1_lab2/packages/mcp-poi
 pnpm dev
 ```
 
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 2: POI MCP server (port 3001)"** to start the MCP server.
+
 By default the MCP server should be running on port 3001. Check the terminal to confirm the exact port that is being used.
 
 ---
 
-## Section 7 — Register the server in the app
+## Section 3 — Register the server in the app
+
+> ✏️ **You implement** — you edit `mcp-servers.config.ts` in this section.
 
 Open [src/lib/mcp-servers.config.ts](lab1_lab2/src/lib/mcp-servers.config.ts#L9) and update `MCP_SERVERS`:
 
-```diff
+```typescript
 export const MCP_SERVERS: McpServerConfig[] = [
-  // Add your MCP server here after building it in the lab exercise.
-+   {
-+     label: "POI",
-+     transport: { type: "http", url: "http://localhost:3001/mcp" },
-+   },
+  {
+    label: "POI",
+    transport: { type: "http", url: "http://localhost:3001/mcp" },
+  },
 ];
 ```
 
@@ -274,13 +292,21 @@ After saving, check the running application in your browser. The MCP status pane
 
 ---
 
-## Section 8 — Wire MCP tools into ChatPanel
+## Section 4 — Wire MCP tools into ChatPanel
+
+> ✏️ **You implement** — you edit `ChatPanel.tsx` in this section.
 
 Let's switch contexts back to the application. Now we will add the scaffolding necessary for the chat to be able to discover our MCP server and use the server's tools.
 
-Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx).
+Open [src/components/chat/ChatPanel.tsx](lab1_lab2/src/components/chat/ChatPanel.tsx). The inline `👇 LAB 2` anchor markers show exactly where each change goes.
+
+> [!TIP]
+>
+> If you prefer to see the full picture first or get stuck at any point, jump to the [**Completed state**](#completed-state) at the bottom of this section.
 
 ### Step 1 - Add imports
+
+Replace the `👇 LAB 2 — STEP 1` import marker with:
 
 ```typescript
 import { useMcpServers } from "@/hooks/useMcpServers";
@@ -306,57 +332,57 @@ const registry = useMemo(() => {
 
 ### Step 4 - Pass merged tools to `useAIChat`
 
-```diff
+Replace the existing `useAIChat` call with:
+
+```typescript
+// tools and toolOrigins are now sourced from the merged registry.
 const { messages, status, error, sendMessage, abort, retry } = useAIChat({
--  tools,
-+  tools: registry.getAll(),
-+  // Required by the app to display tool origin metadata in the UI.
-+  toolOrigins: registry.getOrigins(),
+  tools: registry.getAll(),
+  toolOrigins: registry.getOrigins(),
 });
 ```
 
 ### Completed state
 
-After all four steps, the top of `ChatPanel.tsx` should look like this:
+After all four steps, the top of `ChatPanel.tsx` should look like this — the lines marked with `// ← add this` are the ones you added:
 
-```diff
-  "use client";
+```typescript
+"use client";
 
-  import { useMemo } from "react";
-  import { AlertCircle, RefreshCw, WifiOff } from "lucide-react";
-  import { useAIChat } from "@/hooks/useAIChat";
-  import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-  import { useCesiumViewer } from "@/hooks/useCesiumViewer";
-  import { createCameraTools } from "@/lib/ai/tools/cesium/camera-tools";
-+ import { useMcpServers } from "@/hooks/useMcpServers";
-+ import { MCP_SERVERS } from "@/lib/mcp-servers.config";
-+ import { ToolRegistry } from "@/lib/ai/tools";
-  import { Button } from "@/components/ui/button";
-  import { ChatMessages } from "./ChatMessages";
-  import { ChatInput } from "./ChatInput";
+import { useMemo } from "react";
+import { AlertCircle, RefreshCw, WifiOff } from "lucide-react";
+import { useAIChat } from "@/hooks/useAIChat";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useCesiumViewer } from "@/hooks/useCesiumViewer";
+import { createCameraTools } from "@/lib/ai/tools/cesium/camera-tools";
+import { useMcpServers } from "@/hooks/useMcpServers";        // ← add this
+import { MCP_SERVERS } from "@/lib/mcp-servers.config";       // ← add this
+import { ToolRegistry } from "@/lib/ai/tools";                // ← add this
+import { Button } from "@/components/ui/button";
+import { ChatMessages } from "./ChatMessages";
+import { ChatInput } from "./ChatInput";
 
-  export function ChatPanel() {
-    const { viewerRef } = useCesiumViewer();
-    const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
+export function ChatPanel() {
+  const { viewerRef } = useCesiumViewer();
+  const tools = useMemo(() => createCameraTools(viewerRef), [viewerRef]);
 
-+   const { mcpTools } = useMcpServers({ servers: MCP_SERVERS });
-+
-+   const registry = useMemo(() => {
-+     return new ToolRegistry().registerMcp(mcpTools).registerCesium(tools);
-+   }, [tools, mcpTools]);
+  const { mcpTools } = useMcpServers({ servers: MCP_SERVERS });  // ← add this
 
-    const { messages, status, error, sendMessage, abort, retry } = useAIChat({
--     tools,
-+     tools: registry.getAll(),
-+     toolOrigins: registry.getOrigins(),
-    });
+  const registry = useMemo(() => {                               // ← add this
+    return new ToolRegistry().registerMcp(mcpTools).registerCesium(tools);
+  }, [tools, mcpTools]);
 
-    // ... rest of the component is unchanged
+  const { messages, status, error, sendMessage, abort, retry } = useAIChat({
+    tools: registry.getAll(),       // ← updated
+    toolOrigins: registry.getOrigins(), // ← add this
+  });
+
+  // ... rest of the component is unchanged
 ```
 
 ---
 
-## Section 9 — Test the MCP integration
+## Section 5 — Test the MCP integration
 
 If both servers are running, the status bar should show the POI server in green.
 
@@ -375,7 +401,10 @@ Try these prompts:
 
 ---
 
-## Section 10 — How it works under the hood
+## Section 6 — How it works & extra exercises
+
+<details>
+<summary><strong>How it works under the hood</strong> (click to expand)</summary>
 
 ### Initialization flow — on app mount
 
@@ -393,9 +422,10 @@ Try these prompts:
 2. If the LLM picks `get_points_of_interest`, the app calls the MCP server, the MCP server queries Overpass, and the results are returned back to the chat.
 3. If the LLM picks `flyTo` (often as a follow-up using coordinates returned from the MCP call), the Cesium viewer animates the camera in the same response flow.
 
----
+</details>
 
-## Section 11 — Home exercise: try more POI types
+<details>
+<summary><strong>Home exercise: try more POI types</strong> (click to expand)</summary>
 
 Try different `type` values and observe how result quality changes:
 
@@ -411,9 +441,12 @@ Example prompts:
 
 ![A looping screen capture of the completed Lab 2 interface showing a Cesium map with highlighted points of interest and a chat panel with AI tool activity, illustrating the tutorial workflow in a focused learning environment](images/lab2_completed_examples.gif)
 
+</details>
+
 ---
 
-## BONUS — Build a USGS earthquake MCP server
+<details>
+<summary><strong>BONUS — Build a USGS earthquake MCP server</strong> (click to expand)</summary>
 
 You've built one MCP server (POI). Now build a **second** one that hits a completely different data source — [USGS Earthquake Feeds](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php). This drives home the pattern: any REST API can become an MCP tool in minutes. And because you already have `flyTo`, a prompt like **"Find the strongest earthquake this week and fly to it"** chains two MCP servers + Cesium in a single turn.
 
@@ -430,8 +463,8 @@ Create a new directory `packages/mcp-earthquake/` alongside `mcp-poi/`. Add the 
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts"
+    "dev": "tsx watch src/earthquake-server.ts",
+    "start": "tsx src/earthquake-server.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -521,7 +554,7 @@ The USGS API is free, requires no authentication, and returns GeoJSON — making
 
 ### Step 3 — Register the MCP tool
 
-Create **`packages/mcp-earthquake/src/tools/index.ts`**:
+Create **`packages/mcp-earthquake/src/tools/earthquake-tools.ts`**:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -566,14 +599,14 @@ export function registerEarthquakeTools(server: McpServer) {
 
 ### Step 4 — Create the server entry point
 
-Create **`packages/mcp-earthquake/src/index.ts`**:
+Create **`packages/mcp-earthquake/src/earthquake-server.ts`**:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import cors from "cors";
-import { registerEarthquakeTools } from "./tools/index.js";
+import { registerEarthquakeTools } from "./tools/earthquake-tools.js";
 
 const app = express();
 const allowedOrigin = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
@@ -611,16 +644,16 @@ You should see: `Earthquake MCP server running on http://localhost:3002/mcp`
 
 Open [`src/lib/mcp-servers.config.ts`](lab1_lab2/src/lib/mcp-servers.config.ts) and add the earthquake server below the POI entry:
 
-```diff
+```typescript
 export const MCP_SERVERS: McpServerConfig[] = [
-    {
-      label: "POI",
-      transport: { type: "http", url: "http://localhost:3001/mcp" },
-    },
-+   {
-+     label: "Earthquake",
-+     transport: { type: "http", url: "http://localhost:3002/mcp" },
-+   },
+  {
+    label: "POI",
+    transport: { type: "http", url: "http://localhost:3001/mcp" },
+  },
+  { // ← add this
+    label: "Earthquake",
+    transport: { type: "http", url: "http://localhost:3002/mcp" },
+  },
 ];
 ```
 
@@ -646,15 +679,18 @@ The globe animates to the epicenter of the strongest recent earthquake — an MC
 >
 > This demonstrates a key MCP pattern: **each server owns one data domain**, and the LLM orchestrates across them.
 
+</details>
+
 ---
 
-## Section 12 — What's next
+## Section 7 — What's next
 
 In [**Lab 3 — System prompts and tool descriptions**](LAB_3.md), you will shape agent behavior with `TOOL_GUIDANCE`. The same tools can produce very different outcomes depending on the natural language guidance you provide.
 
 ---
 
-## Section 13 — Troubleshooting
+<details>
+<summary><strong>Troubleshooting</strong> (click to expand)</summary>
 
 | Problem | Solution |
 |---|---|
@@ -663,10 +699,13 @@ In [**Lab 3 — System prompts and tool descriptions**](LAB_3.md), you will shap
 | Agent does not call MCP tool | Check the tool description and make the prompt more explicit. |
 | CORS errors | Ensure the MCP server includes CORS headers for `http://localhost:3000`. |
 
----
+</details>
 
-## Section 14 — Resources
+<details>
+<summary><strong>Resources</strong> (click to expand)</summary>
 
 - [MCP Spec](https://spec.modelcontextprotocol.io)
 - [Vercel AI SDK MCP Tools](https://ai-sdk.dev/docs/ai-sdk-core/mcp-tools)
 - [Overpass API Documentation](https://wiki.openstreetmap.org/wiki/Overpass_API)
+
+</details>

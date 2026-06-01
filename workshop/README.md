@@ -31,12 +31,11 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 
 | Requirement | Notes |
 |---|---|
-| **[Git](https://git-scm.com/)** | Needed to clone the workshop repo — repo link TBD. |
 | **[VS Code](https://code.visualstudio.com/)** | Download from [code.visualstudio.com](https://code.visualstudio.com/). |
 | **Node.js ≥ 22 LTS** | Download from [nodejs.org](https://nodejs.org/).<br>Check version with: `node --version`. |
 | **pnpm 9.15.5** | Install Node.js first.<br>`npm install -g pnpm@9.15.5`<br>(or run `corepack enable` and it will be installed automatically) |
 | **An OpenAI or Anthropic API key** | Will be provided during the workshop. |
-| **Familiarity with the command line** | You should be comfortable running commands in a terminal. |
+| **Familiarity with the command line** *(helpful, not required)* | A few `pnpm` commands are used. If you prefer not to use a terminal, VS Code can run everything for you with one click — see [Running the apps](#running-the-apps). |
 | **Cesium ion token** *(optional)* | [ion.cesium.com](https://ion.cesium.com) → My Tokens → Create token<br>The app works without one, but some imagery/terrain features may be limited. |
 
 ---
@@ -49,7 +48,7 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 | 1 | [Lab 1 — Our first Cesium tool](LAB_1.md) | Create a `flyTo` camera tool from scratch. | 15 min |
 | 2 | [Lab 2 — Build an MCP server](LAB_2.md) | Build a points-of-interest (POI) MCP server and connect it to the agent. | 20 min |
 | 3 | [Lab 3 — System prompts and tool descriptions](LAB_3.md) | Shape agent behavior with `TOOL_GUIDANCE` and tool descriptions. | 20 min |
-| 4 | [Lab 4 — Free exploration with public datasets](LAB_4_challenge.md) | Explore public datasets.<br>Build your own MCP server(s).<br>Generate new AI insights.<br>Show us your creativity! | 25 min |
+| 4 | [Lab 4 — Free exploration with public datasets](LAB_4_challenge.md) | Explore public datasets.<br>Build your own MCP server(s).<br>Generate new AI insights.<br>Show us your creativity! | 20 min |
 
 > [!TIP]
 >
@@ -57,7 +56,83 @@ Please take a moment to prepare your system ahead of the workshop. If you encoun
 
 ---
 
-## Workspace structure
+## Environment setup
+
+Each lab folder contains a `.env.example` file. Copy it to `.env` and fill in your API key before running:
+
+```bash
+cd workshop/lab1_lab2   # or workshop/lab3_lab4
+copy .env.example .env  # Windows
+# cp .env.example .env  # macOS/Linux
+```
+
+Then open `.env` and fill in:
+
+```
+OPENAI_API_KEY=             # will be provided during the workshop
+AI_BASE_URL=                # leave blank unless using a proxy/custom endpoint
+AI_MODEL=gpt-5.4            # change if using a different model
+
+CESIUM_ION_ACCESS_TOKEN=    # optional
+```
+
+> [!NOTE]
+>
+> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
+>
+> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
+
+---
+
+<details>
+<summary><strong>Running the apps</strong></summary>
+
+Each lab needs the Next.js app running, plus one or more MCP servers. You have two ways to start everything.
+
+### Option A — One click in VS Code (no terminal needed)
+
+1. Open the Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS).
+2. Type **Tasks: Run Task** and press Enter.
+3. Pick the task for your lab:
+   - **Lab 1 & 2: App (port 3000)** — Lab 1 only needs the app.
+   - **Lab 1 & 2: Start everything (app + POI server)** — use from Lab 2 onward.
+   - **Lab 3 & 4: Start everything (app + POI + Weather)**
+
+VS Code starts every process in its own panel. To stop them, click the trash-can icon on each terminal panel (or run **Tasks: Terminate Task**).
+
+> [!IMPORTANT]
+>
+> In **Lab 1** you only need the app running — do **not** start the POI server yet. The POI server stays off until you build its tool in Lab 2, so starting it early (via "Start everything" or `pnpm start:all`) will show an error in that terminal. For Lab 1, use the **Lab 1 & 2: App (port 3000)** task or `pnpm dev`.
+
+> Run `pnpm install` once in the lab folder first (Option B step 1). You only need to do this a single time per lab folder.
+
+### Option B — One command in a terminal
+
+From the lab folder, a single command starts the app and all of its MCP servers together:
+
+```bash
+cd workshop/lab1_lab2   # or workshop/lab3_lab4
+pnpm install            # first time only
+pnpm dev                # Lab 1 only (app without MCP servers)
+pnpm start:all          # Lab 2 onward (app + all MCP servers)
+```
+
+> [!IMPORTANT]
+>
+> In **Lab 1**, use `pnpm dev` instead of `pnpm start:all`. The POI server has no tools registered yet, so `start:all` will show an error in that terminal.
+
+Open http://localhost:3000 once everything is running. The status bar turns green when the MCP servers connect.
+
+> [!NOTE]
+>
+> Each lab's Setup section also lists the individual per-process commands if you prefer to run each server in its own terminal.
+
+</details>
+
+---
+
+<details>
+<summary><strong>Workspace structure</strong></summary>
 
 Labs 1–2 and Labs 3–4 each have their own starter app located in the folders `lab1_lab2` and `lab3_lab4`. Both starter apps are structurally the same. Labs 3–4 simply have more tools and an extra MCP server pre-wired.
 
@@ -78,16 +153,16 @@ lab1_lab2/
 │       │   │   └── system-prompt.ts  # AI system prompt (minimal in Lab 1)
 │       │   └── tools/
 │       │       └── cesium/
-│       │           └── index.ts      ← Lab 1: export your new tool
+│       │           └── index.ts      ← Lab 1: the Cesium tools **barrel** (cesium/index.ts) — export your new tool
 │       ├── cesium/
 │       │   └── ...                   ← Lab 1: create camera.ts here
 │       └── mcp-servers.config.ts     ← Lab 2: register POI server
 ├── packages/
 │   └── mcp-poi/                      ← Lab 2: build this entire MCP package
 │       └── src/
-│           ├── index.ts              # Server entry point
+│           ├── poi-server.ts         # Server entry point (mcp-poi/src/poi-server.ts)
 │           ├── overpass.ts           # Overpass API client
-│           └── tools/index.ts        # Tool definitions
+│           └── tools/poi-tools.ts    # Tool definitions (mcp-poi/src/tools/poi-tools.ts)
 └── .env                              # API keys
 ```
 
@@ -119,11 +194,11 @@ lab3_lab4/
 │       └── cesium/                   # 10 helper modules (all pre-wired)
 ├── packages/
 │   ├── mcp-poi/                      # Already built (from Lab 2 pattern)
-│   │   └── src/tools/index.ts        ← Lab 3: optionally edit descriptions
+│   │   └── src/tools/poi-tools.ts    ← Lab 3: optionally edit descriptions
 │   └── mcp-weather/                  # Pre-wired weather server
 │       └── src/
 │           ├── open-meteo.ts
-│           └── tools/index.ts
+│           └── tools/weather-tools.ts
 └── .env                              # API keys
 ```
 
@@ -131,9 +206,12 @@ lab3_lab4/
 > 
 > **Key differences:** `lab1_lab2` starts with almost no tools — you build them. `lab3_lab4` starts fully wired (42 Cesium tools + 4 MCP tools) — you shape how the agent uses them.
 
+</details>
+
 ---
 
-## Architecture overview
+<details>
+<summary><strong>Architecture overview</strong></summary>
 
 ### What is an AI agent?
 
@@ -168,9 +246,23 @@ Agent:
 | External data | MCP servers (Streamable HTTP) | Standard protocol; AI SDK has native MCP support |
 | Styling | Tailwind CSS + shadcn/ui | Fast prototyping |
 
+</details>
+
 ---
 
-## After the workshop
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `EADDRINUSE` or port already in use | Another process is on port 3000/3001/3002. Run `npx kill-port 3000 3001 3002` or restart your machine. |
+| `Cannot find module` / missing packages | Run `pnpm install` inside the lab folder (e.g. `workshop/lab1_lab2`). |
+| Node.js version error | Run `node --version` — must be ≥ 22. Download from [nodejs.org](https://nodejs.org/). |
+| AI returns "API key invalid" | Check your `.env` file exists (not just `.env.example`) and the key has no leading/trailing spaces. |
+| Status bar stays red (MCP not connected) | Wait ~5 s after startup; if still red, check the MCP server terminal panel for errors. |
+
+---
+
+<summary><strong>After the workshop</strong></summary>
 
 <img src="images/ty-book.png" alt="Ty the tiler with a book" width="100" align="right" />
 
