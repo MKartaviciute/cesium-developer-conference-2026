@@ -9,8 +9,8 @@ export const entityTypeSchema = z.enum(["point", "billboard", "label"]);
 export type EntityType = z.infer<typeof entityTypeSchema>;
 
 export const addEntitySchema = z.object({
-  latitude: z.number().describe("Latitude in decimal degrees"),
-  longitude: z.number().describe("Longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()
@@ -134,10 +134,10 @@ export interface AddPolylineOutput {
 // ---------------------------------------------------------------------------
 
 export const addRectangleSchema = z.object({
-  west: z.number().describe("Western boundary in decimal degrees"),
-  south: z.number().describe("Southern boundary in decimal degrees"),
-  east: z.number().describe("Eastern boundary in decimal degrees"),
-  north: z.number().describe("Northern boundary in decimal degrees"),
+  west: z.number().min(-180).max(180).describe("Western boundary in decimal degrees (−180 … 180)"),
+  south: z.number().min(-90).max(90).describe("Southern boundary in decimal degrees (−90 … 90)"),
+  east: z.number().min(-180).max(180).describe("Eastern boundary in decimal degrees (−180 … 180)"),
+  north: z.number().min(-90).max(90).describe("Northern boundary in decimal degrees (−90 … 90)"),
   height: z
     .number()
     .optional()
@@ -176,8 +176,8 @@ export interface AddRectangleOutput {
 // ---------------------------------------------------------------------------
 
 export const addBoxSchema = z.object({
-  latitude: z.number().describe("Center latitude in decimal degrees"),
-  longitude: z.number().describe("Center longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Center latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Center longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()
@@ -219,8 +219,8 @@ export interface AddBoxOutput {
 // ---------------------------------------------------------------------------
 
 export const addCylinderSchema = z.object({
-  latitude: z.number().describe("Center latitude in decimal degrees"),
-  longitude: z.number().describe("Center longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Center latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Center longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()
@@ -262,8 +262,8 @@ export interface AddCylinderOutput {
 // ---------------------------------------------------------------------------
 
 export const addModelSchema = z.object({
-  latitude: z.number().describe("Latitude in decimal degrees"),
-  longitude: z.number().describe("Longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()
@@ -356,8 +356,8 @@ export interface AddCorridorOutput {
 // ---------------------------------------------------------------------------
 
 export const addEllipseSchema = z.object({
-  latitude: z.number().describe("Center latitude in decimal degrees"),
-  longitude: z.number().describe("Center longitude in decimal degrees"),
+  latitude: z.number().min(-90).max(90).describe("Center latitude in decimal degrees (−90 … 90)"),
+  longitude: z.number().min(-180).max(180).describe("Center longitude in decimal degrees (−180 … 180)"),
   altitude: z
     .number()
     .optional()
