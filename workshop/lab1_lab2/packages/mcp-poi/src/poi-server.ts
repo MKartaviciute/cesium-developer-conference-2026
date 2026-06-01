@@ -1,4 +1,6 @@
 /**
+ * Lab 2 — Section 2, Step 2 (📖 Review only)
+ *
  * MCP server entry point.
  *
  * This file is pre-populated — no edits needed here.

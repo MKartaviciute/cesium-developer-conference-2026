@@ -52,10 +52,6 @@ If you need a starting point, [Section 3](#section-3--need-inspiration-start-her
 
 ## Section 1 — Setup (start here)
 
-> [!TIP]
->
-> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
-
 Lab 4 uses the same workspace as Lab 3: `workshop/lab3_lab4`.
 
 ```bash
@@ -72,6 +68,10 @@ Copy `.env.example` to `.env` if you haven't already — this is required to sta
 > Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ### Start all processes
+
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 3 & 4: Start everything (app + POI + Weather)"** to launch all three servers at once.
 
 This lab needs three processes (app + POI server + Weather server). The easiest way is **one command** from the `lab3_lab4` directory, which starts all three together:
 

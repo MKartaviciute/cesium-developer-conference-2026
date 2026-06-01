@@ -1,6 +1,8 @@
 import * as Cesium from "cesium";
 
 /**
+ * Lab 1 — Section 3 (📖 Review only)
+ *
  * This file is pre-populated — no edits needed here.
  * Your work for Lab 1 is in src/lib/ai/tools/cesium/camera-tools.ts.
  */

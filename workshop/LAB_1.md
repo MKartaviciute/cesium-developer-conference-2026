@@ -36,11 +36,7 @@ By the end, the prompt **"Fly to Paris"** will animate the globe camera.
 
 ## Section 1 — Setup (start here)
 
-> [!TIP]
->
-> **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: App (port 3000)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
->
-> Lab 1 only needs the app — don't start the POI server yet (that's Lab 2).
+### Step 1 — Install dependencies
 
 All of our work for this lab takes place inside the `lab1_lab2` directory. Switch to that directory in your terminal and install the node dependencies:
 
@@ -48,6 +44,8 @@ All of our work for this lab takes place inside the `lab1_lab2` directory. Switc
 cd workshop/lab1_lab2
 pnpm install
 ```
+
+### Step 2 — Create your `.env` file
 
 Add a new file called `.env` next to `.env.example`. The easiest way is to copy `.env.example` and rename it:
 
@@ -77,7 +75,13 @@ AI_MODEL=your_model_name_here
 >
 > Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
-Now run the app:
+> [!TIP]
+>
+> **Prefer not to use the command line?** In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), run **Tasks: Run Task**, and choose **"Lab 1 & 2: App (port 3000)"**. That starts the app for you, so you can skip the `pnpm dev` terminal command below. (You still need to run `pnpm install` and create `.env` once.)
+>
+> Lab 1 only needs the app — don't start the POI server yet (that's Lab 2).
+
+### Step 3 — Start the app
 
 ```bash
 pnpm dev

@@ -1,3 +1,9 @@
+/**
+ * Lab 3 — Section 3, Part B (✏️ Edit descriptions)
+ *
+ * Experiment with the `flyTo` description to observe how tool selection changes.
+ * See LAB_3.md Section 3 for step-by-step instructions.
+ */
 "use client";
 
 import { tool } from "ai";

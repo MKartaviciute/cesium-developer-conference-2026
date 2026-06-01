@@ -48,6 +48,7 @@ desktop.ini
 # Editor
 .vscode/*
 !.vscode/tasks.json
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
