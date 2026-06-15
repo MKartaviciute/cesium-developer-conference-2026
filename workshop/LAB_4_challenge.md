@@ -42,7 +42,7 @@ If you need a starting point, [Section 3](#section-3--need-inspiration-start-her
 | MCP POI server | Pre-wired (`get_points_of_interest`) | [`packages/mcp-poi/src/poi-server.ts`](lab3_lab4/packages/mcp-poi/src/poi-server.ts) |
 | MCP Weather server | Pre-wired (`get_current_weather`, `get_forecast`, `get_historical_weather`) | [`packages/mcp-weather/src/weather-server.ts`](lab3_lab4/packages/mcp-weather/src/weather-server.ts) |
 | MCP connection config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
-| Prompt orchestration | Uses your Lab 3 system-prompt updates | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
+| Prompt orchestration | Uses your Lab 3 system-prompt updates | [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) |
 
 ---
 
@@ -120,7 +120,7 @@ The status bar should turn green when both MCP servers connect.
 **Files you may modify in this lab:**
 - `packages/mcp-[your-topic]/` - create or extend an MCP server package
 - [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) - register your server
-- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - optional behavior tuning
+- [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) - optional behavior tuning
 - [`src/lib/ai/tools/cesium/index.ts`](lab3_lab4/src/lib/ai/tools/cesium/index.ts) - optional tool-description tuning or create new tools
 
 ---

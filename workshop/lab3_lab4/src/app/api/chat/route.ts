@@ -1,6 +1,6 @@
 import { streamText, jsonSchema } from "ai";
-import { getModel } from "@/lib/ai/provider";
-import { buildSystemPrompt } from "@/lib/ai/prompts/system-prompt";
+import { getModel } from "@/server/ai/provider";
+import { buildSystemPrompt } from "@/server/ai/system-prompt";
 
 // Route Handlers are always dynamic (no caching) — explicit for clarity.
 export const dynamic = "force-dynamic";

@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * System prompt for the Cesium geospatial AI agent.
  *

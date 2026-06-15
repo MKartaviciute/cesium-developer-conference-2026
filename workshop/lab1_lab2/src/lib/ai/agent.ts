@@ -1,5 +1,6 @@
 "use client";
 
+import { asSchema } from "ai";
 import type { ModelMessage, Tool } from "ai";
 
 export type OnToolStart = (toolCallId: string, toolName: string) => void;
@@ -45,9 +46,9 @@ function serializeTools(
   for (const [name, t] of Object.entries(tools)) {
     out[name] = {
       description: t.description,
-      // AI SDK wraps every schema in an object with a `.jsonSchema` getter
-      // that returns the plain JSON Schema representation.
-      inputSchema: (t.inputSchema as { jsonSchema: unknown }).jsonSchema,
+      // `inputSchema` may be a raw ZodSchema or a wrapped Schema<T>.
+      // `asSchema()` normalises either form and exposes the `.jsonSchema` getter.
+      inputSchema: asSchema(t.inputSchema).jsonSchema,
     };
   }
   return out;
@@ -195,7 +196,7 @@ export async function chat({
       type: "tool-result";
       toolCallId: string;
       toolName: string;
-      output: unknown;
+      output: { type: "json"; value: unknown } | { type: "error-text"; value: string };
     };
     const toolResultContent: ToolResultPart[] = [];
 
@@ -206,15 +207,16 @@ export async function chat({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const output = await t.execute(tc.input as any, { toolCallId: tc.id, messages: currentMessages, abortSignal });
         onToolResult?.(tc.id, tc.name, output);
-        toolResultContent.push({ type: "tool-result", toolCallId: tc.id, toolName: tc.name, output });
+        toolResultContent.push({ type: "tool-result", toolCallId: tc.id, toolName: tc.name, output: { type: "json", value: output } });
       } catch (err) {
-        const output = { success: false, error: String(err) };
-        onToolResult?.(tc.id, tc.name, output);
-        toolResultContent.push({ type: "tool-result", toolCallId: tc.id, toolName: tc.name, output });
+        const errorMessage = String(err);
+        onToolResult?.(tc.id, tc.name, { success: false, error: errorMessage });
+        toolResultContent.push({ type: "tool-result", toolCallId: tc.id, toolName: tc.name, output: { type: "error-text", value: errorMessage } });
       }
     }
 
-    // Append the tool results turn so the model can continue
+    // Append the tool results turn so the model can continue.
+    // In AI SDK v6, tool results use role "tool" with typed output wrappers.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentMessages = [...currentMessages, { role: "tool", content: toolResultContent } as any];
   }

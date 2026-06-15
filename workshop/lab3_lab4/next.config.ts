@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { validateEnv } from "./src/lib/env";
+import { validateEnv } from "./src/server/env";
 
 validateEnv();
 

@@ -7,8 +7,8 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { McpServerPanel } from "@/components/mcp/McpServerPanel";
 import { CesiumToolsPanel } from "@/components/cesium/CesiumToolsPanel";
 import { createCesiumToolGroups } from "@/lib/ai/tools";
-import { DEFAULT_MODELS } from "@/lib/ai/provider";
-import type { AIProvider } from "@/lib/ai/provider";
+import { DEFAULT_MODELS } from "@/lib/ai/models";
+import type { AIProvider } from "@/lib/ai/models";
 
 // Cesium tool definitions are static for the lifetime of the app.
 const CESIUM_TOOL_COUNT = createCesiumToolGroups({ current: null }).reduce(

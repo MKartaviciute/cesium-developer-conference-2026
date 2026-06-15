@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Lab 3 — Section 4 (✏️ You implement)
  *
