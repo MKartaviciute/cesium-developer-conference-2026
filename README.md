@@ -4,6 +4,8 @@
 
 This repository contains all workshop materials for the Cesium Developer Conference 2026 hands-on session.
 
+<video src="https://github.com/user-attachments/assets/2afac64c-3182-4844-88da-b91e8f36c8bb" controls></video>
+
 ---
 
 ## Quick start
