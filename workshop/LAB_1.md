@@ -64,16 +64,12 @@ Then open `.env` and fill in your API key (your workshop organizer will provide 
 # Optional — some imagery/terrain features require a Cesium Ion token
 CESIUM_ION_ACCESS_TOKEN=your_token_here
 
+AI_PROVIDER=openai          # or 'anthropic'
 OPENAI_API_KEY=your_key_here
+# ANTHROPIC_API_KEY=         # uncomment if using Anthropic
 AI_BASE_URL=your_base_url_here
 AI_MODEL=your_model_name_here
 ```
-
-> [!NOTE]
->
-> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
->
-> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ### Step 3 — Start the app
 

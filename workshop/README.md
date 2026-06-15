@@ -69,18 +69,14 @@ copy .env.example .env  # Windows
 Then open `.env` and fill in:
 
 ```
+AI_PROVIDER=openai          # or 'anthropic' if using an Anthropic key
 OPENAI_API_KEY=             # will be provided during the workshop
+# ANTHROPIC_API_KEY=        # uncomment if using Anthropic instead of OpenAI
 AI_BASE_URL=                # leave blank unless using a proxy/custom endpoint
 AI_MODEL=gpt-5.4            # change if using a different model
 
 CESIUM_ION_ACCESS_TOKEN=    # optional
 ```
-
-> [!NOTE]
->
-> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
->
-> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ---
 
@@ -233,7 +229,7 @@ Agent:
 
 > [!TIP]
 >
-> **Key insight:** in this workshop everything runs in the browser. Tools are plain TypeScript functions that call APIs like `viewer.camera.flyTo()`, `viewer.entities.add()`, etc. directly — no serialization, no network hop to a backend. This means you can iterate instantly: change a tool definition, save, and see the effects in the next message.
+> **Key insight:** AI inference runs server-side (inside a Next.js Route Handler at `/api/chat`) so your API keys never reach the browser. Tool *execution*, however, still runs in the browser — Cesium tool `execute` functions call `viewer.camera.flyTo()`, `viewer.entities.add()`, etc. directly against the live globe. The split is: LLM call → server; tool call → browser. This means you can iterate instantly: change a tool definition, save, and see the effects in the next message.
 
 ### Technology choices
 
@@ -242,7 +238,7 @@ Agent:
 | Framework | Next.js + React + TypeScript | Same code runs client and server |
 | Globe | CesiumJS | Full programmatic control for agent commands |
 | AI SDK | Vercel AI SDK `streamText + tool()` | Isomorphic — works in browser & server; 20+ LLM providers |
-| Tool loop | AI SDK `maxSteps` | LLM→tool→LLM |
+| Tool loop | Custom multi-step loop in `agent.ts` | LLM→tool→LLM; tool `execute` runs client-side, LLM call runs server-side |
 | External data | MCP servers (Streamable HTTP) | Standard protocol; AI SDK has native MCP support |
 | Styling | Tailwind CSS + shadcn/ui | Fast prototyping |
 

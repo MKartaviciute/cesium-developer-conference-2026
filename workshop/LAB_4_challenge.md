@@ -44,10 +44,6 @@ If you need a starting point, [Section 3](#section-3--need-inspiration-start-her
 | MCP connection config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
 | Prompt orchestration | Uses your Lab 3 system-prompt updates | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
 
-> [!NOTE]
->
-> This lab will not prescribe exact tools, MCP servers, or prompt wording. You are expected to experiment with the concepts you've learned. **Workshop facilitators are available if you need help. 🙋**
-
 ---
 
 ## Section 1 — Setup (start here)
@@ -60,12 +56,6 @@ pnpm install
 ```
 
 Copy `.env.example` to `.env` if you haven't already — this is required to start the app (same values as Lab 3).
-
-> [!NOTE]
->
-> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
->
-> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ### Start all processes
 
