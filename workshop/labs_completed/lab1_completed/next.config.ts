@@ -6,15 +6,12 @@ const CESIUM_BASE_URL = "/cesium";
 const nextConfig: NextConfig = {
   devIndicators: false,
   // Expose build-time constants to browser bundles.
-  // NOTE: API keys are intentionally inlined here for this local workshop.
-  // In production, move LLM calls to a server-side Route Handler.
+  // LLM calls run server-side in src/app/api/chat/route.ts, so API keys are
+  // no longer inlined into the browser bundle.
   env: {
     CESIUM_BASE_URL,
     AI_PROVIDER: process.env.AI_PROVIDER ?? "openai",
     AI_MODEL: process.env.AI_MODEL ?? "",
-    AI_BASE_URL: process.env.AI_BASE_URL ?? "",
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "",
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
     CESIUM_ION_ACCESS_TOKEN: process.env.CESIUM_ION_ACCESS_TOKEN ?? "",
   },
 

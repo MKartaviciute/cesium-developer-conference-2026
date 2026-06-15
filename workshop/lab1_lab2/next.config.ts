@@ -10,11 +10,11 @@ const nextConfig: NextConfig = {
   // In production, move LLM calls to a server-side Route Handler.
   env: {
     CESIUM_BASE_URL,
+    // Non-sensitive config — safe to expose to the browser bundle.
     AI_PROVIDER: process.env.AI_PROVIDER ?? "openai",
     AI_MODEL: process.env.AI_MODEL ?? "",
-    AI_BASE_URL: process.env.AI_BASE_URL ?? "",
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "",
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
+    // API keys are intentionally omitted here.
+    // They are read server-side only inside src/app/api/chat/route.ts.
     CESIUM_ION_ACCESS_TOKEN: process.env.CESIUM_ION_ACCESS_TOKEN ?? "",
   },
 
