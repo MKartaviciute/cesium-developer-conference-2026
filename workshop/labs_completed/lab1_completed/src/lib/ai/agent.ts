@@ -1,24 +1,31 @@
-import { streamText, stepCountIs } from "ai";
-import type { ModelMessage, Tool } from "ai";
-import { getModel } from "@/lib/ai/provider";
-import { buildSystemPrompt } from "@/lib/ai/prompts/system-prompt";
+"use client";
 
-export type OnToolStart = (toolCallId: string, toolName: string) => void;
-export type OnToolCall = (toolCallId: string, toolName: string, input: unknown) => void;
-export type OnToolResult = (toolCallId: string, toolName: string, output: unknown) => void;
+import type { ModelMessage } from "ai";
+import { fetchChatStep, serializeTools } from "./chat-transport";
+import { processStream } from "./data-stream";
+import { executeTools } from "./tool-execution";
+import type { AssistantMessagePart, ChatOptions } from "./agent-types";
 
-export interface ChatOptions {
-  messages: ModelMessage[];
-  tools: Record<string, Tool>;
-  onTextChunk: (chunk: string) => void;
-  maxSteps?: number;
-  abortSignal?: AbortSignal;
-  viewerContext?: string;
-  onToolStart?: OnToolStart;
-  onToolCall?: OnToolCall;
-  onToolResult?: OnToolResult;
-}
+export type {
+  ChatOptions,
+  OnTextChunk,
+  OnToolStart,
+  OnToolCall,
+  OnToolResult,
+} from "./agent-types";
 
+/**
+ * Send a chat request to the server-side route handler and stream the
+ * response.  Tool calls that come back from the server are executed locally
+ * (in the browser) and the results are appended to the message history for
+ * the next round, up to `maxSteps` times.
+ *
+ * Data-stream protocol types handled:
+ *   0  — text delta
+ *   b  — tool-call start (args streaming begins)
+ *   9  — complete tool call (args fully received)
+ *   3  — error
+ */
 export async function chat({
   messages,
   tools,
@@ -30,34 +37,32 @@ export async function chat({
   onToolCall,
   onToolResult,
 }: ChatOptions) {
-  const base = buildSystemPrompt();
-  const system = viewerContext ? `${base}\n\n${viewerContext}` : base;
+  const serializedTools = serializeTools(tools);
+  let currentMessages: ModelMessage[] = [...messages];
 
-  const result = streamText({
-    model: getModel(),
-    system,
-    messages,
-    tools,
-    stopWhen: stepCountIs(maxSteps),
-    abortSignal,
-  });
+  for (let step = 0; step < maxSteps; step++) {
+    const response = await fetchChatStep(currentMessages, viewerContext, serializedTools, abortSignal);
 
-  for await (const chunk of result.fullStream) {
-    if (chunk.type === "text-delta") {
-      onTextChunk(chunk.text);
-    } else if (chunk.type === "tool-input-start") {
-      onToolStart?.(chunk.id, chunk.toolName);
-    } else if (chunk.type === "tool-call") {
-      onToolCall?.(chunk.toolCallId, chunk.toolName, chunk.input);
-    } else if (chunk.type === "tool-result") {
-      onToolResult?.(chunk.toolCallId, chunk.toolName, chunk.output);
-    } else if (chunk.type === "tool-error") {
-      onToolCall?.(chunk.toolCallId, chunk.toolName, chunk.input);
-      onToolResult?.(chunk.toolCallId, chunk.toolName, { success: false, error: String(chunk.error) });
-    } else if (chunk.type === "error") {
-      throw chunk.error;
-    }
+    const { textContent, toolCalls } = await processStream(
+      response.body!,
+      onTextChunk,
+      onToolStart,
+      onToolCall,
+    );
+
+    // No tool calls → model is done
+    if (toolCalls.length === 0) break;
+
+    // Append the assistant turn (text + tool calls) to the history
+    const assistantContent: AssistantMessagePart[] = [];
+    if (textContent) assistantContent.push({ type: "text", text: textContent });
+    assistantContent.push(...toolCalls);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    currentMessages = [...currentMessages, { role: "assistant", content: assistantContent } as any];
+
+    // Execute tools locally and append results so the model can continue
+    const toolResults = await executeTools(toolCalls, tools, currentMessages, abortSignal, onToolResult);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    currentMessages = [...currentMessages, { role: "tool", content: toolResults } as any];
   }
-
-  return result;
 }

@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { validateEnv } from "./src/lib/env";
+import { validateEnv } from "./src/server/env";
 
 validateEnv();
 
@@ -13,15 +13,9 @@ const nextConfig: NextConfig = {
     CESIUM_ION_ACCESS_TOKEN: process.env.CESIUM_ION_ACCESS_TOKEN ?? "",
     AI_PROVIDER: process.env.AI_PROVIDER ?? "openai",
     AI_MODEL: process.env.AI_MODEL ?? "",
-    // SECURITY NOTE (C-1/C-2, H-3): AI_BASE_URL, OPENAI_API_KEY, and
-    // ANTHROPIC_API_KEY are intentionally placed here for the current
-    // client-side architecture.  These values are inlined into the browser
-    // bundle.  Before any public deployment, move LLM calls to a server-side
-    // Next.js Route Handler and remove these keys from this `env` block so
-    // they remain server-only secrets.  See docs/ARCHITECTURE-COMPARISON.md.
-    AI_BASE_URL: process.env.AI_BASE_URL ?? "",
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "",
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
+    // API keys (AI_BASE_URL, OPENAI_API_KEY, ANTHROPIC_API_KEY) are
+    // intentionally omitted here.  They are read server-side only inside
+    // src/app/api/chat/route.ts so they never reach the browser bundle.
   },
 
   // HTTP security response headers applied to every route.

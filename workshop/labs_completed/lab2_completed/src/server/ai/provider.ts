@@ -1,24 +1,22 @@
-"use client";
+import "server-only";
 
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
-
-export type AIProvider = "openai" | "anthropic";
-
-export const DEFAULT_MODELS: Record<AIProvider, string> = {
-  openai: "gpt-4o-mini",
-  anthropic: "claude-3-5-sonnet-20241022",
-};
+import { DEFAULT_MODELS, type AIProvider } from "@/lib/ai/models";
 
 /**
  * Returns a language model configured from environment variables.
  *
- * Variables are exposed to the browser via the `env` block in next.config.ts:
+ * This module is server-only (`import "server-only"`), so the secret API keys
+ * below are read from `process.env` on the server and never reach the browser:
+ *   OPENAI_API_KEY / ANTHROPIC_API_KEY — the provider API key (secret)
+ *   AI_BASE_URL  — optional custom endpoint (Azure AI Foundry, local proxy, etc.)
+ *
+ * The non-sensitive `AI_PROVIDER` and `AI_MODEL` values are also exposed to the
+ * browser via the `env` block in next.config.ts (e.g. for the status bar):
  *   AI_PROVIDER  — "openai" (default) or "anthropic"
  *   AI_MODEL     — optional override (e.g. "gpt-4o", "claude-3-5-sonnet-20241022")
- *   AI_BASE_URL  — optional custom endpoint (Azure AI Foundry, local proxy, etc.)
- *   OPENAI_API_KEY / ANTHROPIC_API_KEY — the provider API key
  */
 export function getModel(): LanguageModel {
   const provider = (process.env.AI_PROVIDER ?? "openai") as AIProvider;

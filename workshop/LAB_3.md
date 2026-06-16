@@ -30,7 +30,7 @@ By the end, queries like **"Find restaurants within 1 km of the Colosseum in Rom
 | MCP toolset | 4 tools pre-wired<br>2 MCP servers<br>(POI + Weather) | [`packages/mcp-poi/src/poi-server.ts`](lab3_lab4/packages/mcp-poi/src/poi-server.ts), [`packages/mcp-weather/src/weather-server.ts`](lab3_lab4/packages/mcp-weather/src/weather-server.ts) |
 | MCP server config | POI + Weather already registered | [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts) |
 | Chat tool wiring | Cesium + MCP tools already merged in chat | [`src/components/chat/ChatPanel.tsx`](lab3_lab4/src/components/chat/ChatPanel.tsx) |
-| System prompt | `ROLE` only, no `TOOL_GUIDANCE` yet | [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) |
+| System prompt | `ROLE` only, no `TOOL_GUIDANCE` yet | [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) |
 | Tool descriptions | Present and editable | [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts), [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) |
 
 <details>
@@ -92,19 +92,15 @@ copy .env.example .env  # Windows
 Then fill in your API key values:
 
 ```env
+AI_PROVIDER=openai          # or 'anthropic'
 OPENAI_API_KEY=your_key_here
+# ANTHROPIC_API_KEY=         # uncomment if using Anthropic
 AI_BASE_URL=your_base_url_here
 AI_MODEL=your_model_name_here
 
 # Optional
 CESIUM_ION_ACCESS_TOKEN=
 ```
-
-> [!NOTE]
->
-> Using a workshop-provided key? The `OPENAI_API_KEY` is split for security: the first part was sent via email, and the last few characters are in the [setup gist](https://gist.github.com/tomdicarlo/64bec5132f8c93f3875607d6dac20e43). Concatenate both parts to form the complete key — no spaces and no quotes.
->
-> Example: if the email part is `sk-abc123...` and the gist part is `xyz789`, the line becomes `OPENAI_API_KEY=sk-abc123...xyz789`.
 
 ### Step 3 — Start all processes
 
@@ -132,10 +128,6 @@ Once ready, the app terminal will show something like:
 
 Open a browser and navigate to **http://localhost:3000**.
 
-> [!NOTE]
->
-> **Refresh the browser after every file save.** Next.js does not hot-reload tool descriptions or the system prompt — you must manually refresh (`F5` or `Ctrl+R`) to pick up your changes.
-
 <details>
 <summary>Prefer three separate terminals? (click to expand)</summary>
 
@@ -161,6 +153,10 @@ Once the app server is ready, open a browser and navigate to **http://localhost:
 
 </details>
 
+> [!NOTE]
+>
+> **Refresh the browser after every file save.** Next.js does not hot-reload tool descriptions or the system prompt — you must manually refresh (`F5` or `Ctrl+R`) to pick up your changes.
+
 The app auto-connects to both MCP servers through [`src/lib/mcp-servers.config.ts`](lab3_lab4/src/lib/mcp-servers.config.ts).
 
 ![Lab 3 starting view — 42 Cesium tools and 4 MCP tools](images/lab3_starting_state.gif)
@@ -170,7 +166,7 @@ The app auto-connects to both MCP servers through [`src/lib/mcp-servers.config.t
 > In the tools panel, verify you can see **42 Cesium tools** and **4 MCP tools** before starting experiments.
 
 **Files you will modify in this lab:**
-- [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
+- [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) - edit (add `TOOL_GUIDANCE`)
 - [`src/lib/ai/tools/cesium/camera-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/camera-tools.ts) - edit (description experiments)
 - [`src/lib/ai/tools/cesium/entity-tools.ts`](lab3_lab4/src/lib/ai/tools/cesium/entity-tools.ts) - edit (description experiments)
 - the MCP tool-definitions file [`packages/mcp-poi/src/tools/poi-tools.ts`](lab3_lab4/packages/mcp-poi/src/tools/poi-tools.ts) - optional challenge only
@@ -326,7 +322,7 @@ Start with this prompt again:
 
 Without global guidance, responses often stop at data retrieval or result in inconsistent tool sequencing.
 
-Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts#L22) and make two changes:
+Open [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts#L24) and make two changes:
 
 **Step 1 — Add the `TOOL_GUIDANCE` constant** below the `ROLE` block (at the `// TODO` comment on line 22):
 
@@ -362,7 +358,7 @@ Save, reload, and run the same prompt again.
 
 ## Section 5 — A completed example
 
-After some trial and error, your [`system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
+After some trial and error, your [`system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) may look something like below. Please copy or merge this `TOOL_GUIDANCE` into your code.
 
 ```typescript
 // Global rules that apply across all tools.
@@ -444,7 +440,7 @@ The tool calls will be the same both times — but the styling details will like
 
 ### Part 2 — Shape the output with formatting rules
 
-Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) and add these rules inside your `TOOL_GUIDANCE` string:
+Open [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) and add these rules inside your `TOOL_GUIDANCE` string:
 
 ```typescript
 - Entity labels must always use this format: "[N] Name (Category)"
@@ -489,7 +485,7 @@ The first prompt is fully covered by your rules — tools fire, labels follow th
 
 #### Step 2 — Swap to a domain-specific persona
 
-Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) and replace the `ROLE` content:
+Open [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) and replace the `ROLE` content:
 
 ```typescript
 const ROLE = `You are an enthusiastic urban tourism guide with deep knowledge of world cities.
@@ -560,7 +556,7 @@ Reload the browser and run:
 
 #### Step 2 — Add a SAFEGUARDS section
 
-Open [`src/lib/ai/prompts/system-prompt.ts`](lab3_lab4/src/lib/ai/prompts/system-prompt.ts) and add a new block:
+Open [`src/server/ai/system-prompt.ts`](lab3_lab4/src/server/ai/system-prompt.ts) and add a new block:
 
 ```typescript
 const SAFEGUARDS = `
