@@ -1,6 +1,7 @@
 import { streamText, jsonSchema } from "ai";
 import { getModel } from "@/server/ai/provider";
 import { buildSystemPrompt } from "@/server/ai/system-prompt";
+import { StreamEvent, ChunkType } from "@/lib/ai/stream-protocol";
 
 // Route Handlers are always dynamic (no caching) — explicit for clarity.
 export const dynamic = "force-dynamic";
@@ -55,13 +56,12 @@ export async function POST(req: Request) {
   // Re-hydrate tool definitions from JSON schemas.
   // No execute function — tool calls stream back to the client for local execution.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tools: Record<string, any> = {};
-  for (const [name, schema] of Object.entries(toolSchemas)) {
-    tools[name] = {
-      description: schema.description,
-      inputSchema: jsonSchema(schema.inputSchema),
-    };
-  }
+  const tools: Record<string, any> = Object.fromEntries(
+    Object.entries(toolSchemas).map(([name, schema]) => [
+      name,
+      { description: schema.description, inputSchema: jsonSchema(schema.inputSchema) },
+    ]),
+  );
 
   const result = streamText({
     model: getModel(),
@@ -79,21 +79,21 @@ export async function POST(req: Request) {
         for await (const chunk of result.fullStream) {
           let line: string | null = null;
 
-          if (chunk.type === "text-delta") {
-            line = `0:${JSON.stringify(chunk.text)}\n`;
-          } else if (chunk.type === "tool-input-start") {
-            line = `b:${JSON.stringify({ toolCallId: chunk.id, toolName: chunk.toolName })}\n`;
-          } else if (chunk.type === "tool-call") {
+          if (chunk.type === ChunkType.TextDelta) {
+            line = `${StreamEvent.TextDelta}:${JSON.stringify(chunk.text)}\n`;
+          } else if (chunk.type === ChunkType.ToolInputStart) {
+            line = `${StreamEvent.ToolCallStart}:${JSON.stringify({ toolCallId: chunk.id, toolName: chunk.toolName })}\n`;
+          } else if (chunk.type === ChunkType.ToolCall) {
             // AI SDK fullStream uses `input`; map to `args` for the wire format
-            line = `9:${JSON.stringify({ toolCallId: chunk.toolCallId, toolName: chunk.toolName, args: chunk.input })}\n`;
-          } else if (chunk.type === "error") {
-            line = `3:${JSON.stringify(String(chunk.error))}\n`;
+            line = `${StreamEvent.ToolCall}:${JSON.stringify({ toolCallId: chunk.toolCallId, toolName: chunk.toolName, args: chunk.input })}\n`;
+          } else if (chunk.type === ChunkType.Error) {
+            line = `${StreamEvent.Error}:${JSON.stringify(String(chunk.error))}\n`;
           }
 
           if (line) controller.enqueue(encoder.encode(line));
         }
       } catch (err) {
-        controller.enqueue(encoder.encode(`3:${JSON.stringify(String(err))}\n`));
+        controller.enqueue(encoder.encode(`${StreamEvent.Error}:${JSON.stringify(String(err))}\n`));
       } finally {
         controller.close();
       }
